@@ -29,19 +29,27 @@
 *   断言: 验证渲染输出 (`wrapper.html()`, `wrapper.text()`, `wrapper.isVisible()`), 事件触发 (`wrapper.emitted()`), Props/State 变化等。
 *   模拟依赖: 对组件依赖的 Store、Router、全局方法或子组件进行 Mock 或 Stub。
 
-## 4. 建议覆盖的组件 (示例)
+## 4. 当前覆盖范围与记录
 
 *   **展示型组件:**
-    *   `FoodCard.vue`: 验证根据传入的 `food` prop 正确显示名称、图片、价格、评分等。
-    *   `RestaurantCard.vue`: 类似 FoodCard。
-    *   `PostItem.vue`: 验证帖子信息展示。
-    *   `CommentList.vue`: 验证评论列表渲染，处理空列表情况。
-    *   `CollectionList.vue`: 验证收藏项渲染，类型角标显示。
+    *   **[x] `src/components/business/FoodCard.vue`**
+        *   **状态:** 已完成基本 Props 渲染测试并通过。
+        *   **记录:**
+            *   验证了名称 (`span.name`)、价格 (`span.price`)、图片 (`img.image`)、标签 (`div.tags .el-tag`) 的正确渲染和空状态处理。
+            *   评分 (`el-rate`) 的测试遇到了困难：
+                *   最初尝试检查文本内容失败。
+                *   尝试使用 `@vue/test-utils` 的 `findComponent` 和 `global.stubs` 来查找存根并检查 props，但无论使用简单存根、显式存根、PascalCase 还是 kebab-case 名称，`findComponent` 均无法稳定找到存根 (`rateStub.exists()` 持续失败)。
+                *   **最终解决方案:** 改为检查条件渲染相关的 DOM 元素：使用 `wrapper.find('el-rate-stub').exists()` 和 `wrapper.find('.no-rating').exists()` 来断言 `el-rate` 或"暂无评分"文本是否按预期显示。
+            *   **待办:** 测试点击事件 (`@click`) 是否触发 (如果需要)。
+    *   [ ] `RestaurantCard.vue`
+    *   [ ] `PostItem.vue`
+    *   [ ] `CommentList.vue`
+    *   [ ] `CollectionList.vue`
 *   **交互型组件:**
-    *   `CreatePostDialog.vue`: 验证表单输入、图片上传交互、按钮点击、事件触发。
-    *   各种表单组件 (如 `LoginView.vue`, `RegisterView.vue`, `Settings.vue` 中的表单部分): 验证输入、校验逻辑、提交事件。
+    *   [ ] `CreatePostDialog.vue`
+    *   [ ] 其他表单组件...
 *   **布局组件:**
-    *   `DefaultLayout.vue`: 验证 Slot 渲染，导航链接（可 Mock Router）。
+    *   [ ] `DefaultLayout.vue`
 
 ## 5. 运行测试
 
