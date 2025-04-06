@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRST-git 开发总结</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f6f8fa;
+            /* GitHub-like background */
+            color: #24292e;
+            /* GitHub text color */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #e1e4e8;
+            /* GitHub border color */
+            border-radius: 6px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            border-bottom: 1px solid #eaecef;
+            /* GitHub heading border */
+            padding-bottom: 0.3em;
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2em;
+        }
+
+        h2 {
+            font-size: 1.5em;
+        }
+
+        h3 {
+            font-size: 1.25em;
+            border-bottom: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            margin-bottom: 16px;
+            display: block;
+            overflow-x: auto;
+            /* Allow horizontal scrolling for tables */
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            border: 1px solid #dfe2e5;
+            /* GitHub table border */
+            padding: 8px 12px;
+            text-align: left;
+            white-space: normal;
+            /* Allow text wrapping in cells */
+        }
+
+        th {
+            background-color: #f6f8fa;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f6f8fa;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            background-color: rgba(27, 31, 35, 0.05);
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 3px;
+        }
+
+        pre {
+            background-color: #f6f8fa;
+            border: 1px solid #e1e4e8;
+            border-radius: 3px;
+            padding: 16px;
+            overflow: auto;
+            line-height: 1.45;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            margin: 0;
+            font-size: 100%;
+            border-radius: 0;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .problem {
+            color: #cb2431;
+            /* GitHub error/problem color */
+            font-weight: bold;
+        }
+
+        .solution {
+            color: #22863a;
+            /* GitHub success/solution color */
+        }
+
+        .workaround {
+            color: #b08800;
+            /* Suggesting a warning/workaround color */
+        }
+
+        .code-block {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>FRST-git 项目开发总结</h1>
+
+        <p>本文档总结了近期在 FRST-git (Vue 前端应用) 项目中的主要开发活动、遇到的问题及相应的解决方案。</p>
+
+        <h2>主要功能开发与增强</h2>
+        <ul>
+            <li><strong>社区模块基础:</strong>
+                <ul>
+                    <li>实现了社区帖子列表 (`CommunityView.vue`) 的基本展示与排序 (最新回复、最新发布、热门)。</li>
+                    <li>实现了帖子详情 (`PostDetail.vue`) 的基本路由跳转。</li>
+                    <li>添加了发布新帖的对话框 (`CreatePostDialog.vue`) 框架，包含内容输入和图片上传（最多1张）。</li>
+                    <li>实现了帖子评论列表 (`CommentList.vue`) 的组件和基础展示。</li>
+                </ul>
+            </li>
+            <li><strong>时间格式化:</strong> 创建了 `timeFormatter.ts` 工具，提供 `formatRelativeTime`
+                函数，用于将时间戳转换为相对时间（如"几分钟前"），并在评论列表等处应用。</li>
+            <li><strong>个人中心增强:</strong>
+                <ul>
+                    <li>重构了"我的收藏"页面 (`profile/Index.vue`)，将其分为"食物收藏"和"帖子收藏"两个标签页。</li>
+                    <li>实现了收藏列表 (`CollectionList.vue`) 的基本展示，包含图片、标题和类型角标。</li>
+                    <li>添加了收藏功能的后端逻辑 (`user.ts` 中的 `addCollection`, `fetchCollections`) 和状态管理 (Pinia Store)。</li>
+                </ul>
+            </li>
+            <li><strong>美食发现与详情:</strong>
+                <ul>
+                    <li>创建了美食发现页面 (`DiscoverView.vue`)，包含分类筛选、关键词搜索（防抖处理）和分页功能。</li>
+                    <li>实现了美食详情页面 (`FoodDetailView.vue`)，展示美食图片、名称、评分、价格、标签、描述和收藏按钮。</li>
+                </ul>
+            </li>
+            <li><strong>图片处理与占位符:</strong>
+                <ul>
+                    <li>为收藏列表和详情页添加了图片加载失败或 URL 无效时的灰色占位符。</li>
+                    <li>在从美食详情页添加收藏时，使用固定占位符 URL 避免直接使用可能无效的本地开发路径。</li>
+                </ul>
+            </li>
+            <li><strong>布局与导航:</strong>
+                <ul>
+                    <li>构建了基础的默认布局 (`DefaultLayout.vue`)，包含顶部导航栏。</li>
+                </ul>
+            </li>
+            <li><strong>代码库管理:</strong> 使用 Git 进行版本控制，并将代码库同步到 GitHub。</li>
+        </ul>
+
+        <h2>遇到的主要问题及解决方案</h2>
+
+        <h3>功能与逻辑问题</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>区域/组件</th>
+                    <th>问题描述</th>
+                    <th>解决方案/状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>CommentList.vue</code></td>
+                    <td><span class="problem">Import Error:</span> 模块解析失败，无法找到 <code>@/utils/formatters</code>。</td>
+                    <td><span class="solution">原因:</span> 文件被重命名为 <code>timeFormatter.ts</code>。<br><span
+                            class="solution">解决:</span> 修改 <code>CommentList.vue</code> 中的 import 路径为
+                        <code>@/utils/timeFormatter.ts</code>，并更新调用的函数名为 <code>formatRelativeTime</code>。</td>
+                </tr>
+                <tr>
+                    <td><code>DefaultLayout.vue</code> (导航栏)</td>
+                    <td><span class="problem">UI Glitch:</span> 导航菜单末尾持续出现无法移除的 "el-sub-menu__icon-more" 溢出指示符（三个点）。
+                    </td>
+                    <td><span class="workaround">原因:</span> Element Plus `el-menu` 组件的内部计算逻辑问题，难以直接修复。<br><span
+                            class="workaround">解决 (Workaround):</span> 添加全局 CSS 强制隐藏该图标：
+                        <div class="code-block">
+                            <pre><code>.header .el-menu--horizontal .el-sub-menu__icon-more {
+    display: none !important;
+}</code></pre>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>收藏功能 (多处)</td>
+                    <td><span class="problem">Image Display Issues:</span> 收藏列表图片无法显示或显示错误。</td>
+                    <td><span class="solution">原因:</span> 添加收藏时可能传入了无效的本地路径或空 URL。<br><span class="solution">解决:</span>
+                        <ul>
+                            <li>在 <code>user.ts</code> 的 <code>addCollection</code> 中为 <code>imageUrl</code>
+                                添加了默认灰色占位符逻辑。</li>
+                            <li>修改 <code>FoodDetailView.vue</code> 添加收藏时，不使用本地 <code>coverImage</code> 路径，而是使用固定占位符 URL。
+                            </li>
+                            <li><code>CollectionList.vue</code> 改进了图片加载状态和错误处理。</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>TypeScript 类型检查</td>
+                    <td><span class="problem">各种错误和警告:</span> 模块未找到、参数数量不匹配、未使用的变量/导入、空的 CSS 规则集等。</td>
+                    <td><span class="solution">解决:</span>
+                        <ul>
+                            <li>创建了缺失的类型定义文件 <code>src/types/post.d.ts</code>。</li>
+                            <li>修复了函数调用时的参数错误。</li>
+                            <li>移除了各组件中未使用的导入和变量声明。</li>
+                            <li>删除了空的 SCSS 规则集。</li>
+                            <li><span class="workaround">注意:</span> <code>DiscoverView.vue</code>
+                                中一个指向数组定义的类型错误持续存在，疑似误报，暂未解决。</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Git 工作流与 GitHub 同步问题</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>阶段</th>
+                    <th>问题描述</th>
+                    <th>解决方案/过程</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>提交</td>
+                    <td><span class="problem">目标不清晰:</span> 希望上传 <code>FRST-git-master</code> 目录下所有文件，但之前操作可能在子目录
+                        <code>vue-FRS</code> 中。</td>
+                    <td><span class="solution">解决:</span> 明确目标是管理根目录。
+                        <ul>
+                            <li>尝试删除可能存在的嵌套 <code>.git</code> 目录 (后发现不存在)。</li>
+                            <li>切换到根目录 <code>FRST-git-master</code>。</li>
+                            <li>确认根目录为唯一的 Git 仓库。</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>连接远程仓库</td>
+                    <td><span class="problem">连接失败:</span> 在根目录执行 <code>git remote -v</code>
+                        无输出，<code>git remote add origin</code> 因终端渲染问题失败。</td>
+                    <td><span class="solution">解决:</span>
+                        <ul>
+                            <li>手动在 PowerShell 中执行 <code>git remote add origin &lt;URL&gt;</code>。</li>
+                            <li>通过 <code>git remote -v</code> 确认 <code>origin</code> 设置成功。</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>首次推送 (HTTPS)</td>
+                    <td><span class="problem">推送失败:</span> 出现 "Recv failure: Connection was reset" 和 "Could not connect
+                        to server" 错误。</td>
+                    <td><span class="solution">原因:</span> 本地网络环境到 GitHub 的 HTTPS 连接不稳定或超时。<br><span
+                            class="solution">解决:</span> 切换到 SSH 连接方式。
+                        <ul>
+                            <li>执行 <code>git remote set-url origin git@github.com:...</code> 更改远程 URL。</li>
+                            <li>(假设用户已配置好本地 SSH 密钥并添加到 GitHub)。</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>首次推送 (SSH)</td>
+                    <td><span class="problem">推送被拒绝:</span> SSH 连接成功，但因远程仓库存在本地没有的历史记录而被拒绝 (<code>fetch first</code>)。
+                    </td>
+                    <td><span class="solution">原因:</span> 本地是全新的 "Initial commit"，远程有旧历史。<br><span
+                            class="solution">解决:</span> 使用强制推送覆盖远程历史。
+                        <ul>
+                            <li>执行 <code>git push --force origin master</code>。</li>
+                            <li>推送成功，远程仓库与本地完全同步。</li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>总结</h2>
+        <p>本次开发周期内，项目的基础功能得到了显著完善，特别是社区、收藏和发现模块。解决了包括模块导入、UI 显示、图片处理、类型检查在内的多个问题。同时，克服了 Git
+            配置和网络连接方面的挑战，成功将包含所有项目文件的代码库同步到了 GitHub。后续可继续完善功能细节、处理剩余的类型警告，并关注潜在的性能优化点。</p>
+
+    </div>
+</body>
+
+</html>
