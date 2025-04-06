@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食推荐项目概览</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f2f5;
+            /* Add a light background to body */
+        }
+
+        h1,
+        h2,
+        h3 {
+            border-bottom: 1px solid #ccc;
+            /* Make border slightly darker */
+            padding-bottom: 10px;
+            margin-top: 30px;
+            color: #333;
+        }
+
+        .diagram,
+        .prototype {
+            border: 1px solid #ddd;
+            /* Slightly lighter border */
+            padding: 20px;
+            /* Increase padding */
+            margin-bottom: 25px;
+            /* Increase margin */
+            background-color: #ffffff;
+            /* White background for contrast */
+            border-radius: 8px;
+            /* Add rounded corners */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            /* Add subtle shadow */
+        }
+
+        .prototype section {
+            margin-bottom: 25px;
+            /* Increase spacing between sections */
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            /* Dashed border -> solid but lighter */
+            background-color: #fdfdfd;
+            /* Slightly off-white background for sections */
+            border-radius: 6px;
+            /* Rounded corners for sections */
+        }
+
+        .prototype h4 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            /* Adjust padding */
+            margin-bottom: 20px;
+            /* Increase spacing after heading */
+            color: #555;
+        }
+
+        .prototype label {
+            display: block;
+            margin-bottom: 6px;
+            /* Increase spacing */
+            font-weight: 600;
+            /* Slightly bolder */
+            color: #444;
+        }
+
+        .prototype input[type="text"],
+        .prototype input[type="email"],
+        .prototype input[type="password"],
+        .prototype input[type="tel"],
+        /* Added tel type */
+        .prototype input[type="file"],
+        .prototype input[type="date"],
+        /* Added date type */
+        .prototype select,
+        .prototype textarea {
+            /* width: calc(100% - 18px); /* Adjust for padding */
+            width: 100%;
+            /* Use 100% width with box-sizing */
+            padding: 10px;
+            /* Increase padding */
+            margin-bottom: 15px;
+            /* Increase spacing */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            /* Slightly rounder corners */
+            box-sizing: border-box;
+            /* Include padding and border in width */
+            background-color: #fff;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .prototype input:focus,
+        .prototype select:focus,
+        .prototype textarea:focus {
+            border-color: #007bff;
+            /* Highlight focus */
+            outline: none;
+        }
+
+        .prototype button {
+            padding: 10px 20px;
+            /* Adjust padding */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+            border-radius: 4px;
+            /* Match input fields */
+            font-size: 1em;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .prototype button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Secondary button style */
+        .prototype button[type="button"] {
+            background-color: #6c757d;
+        }
+
+        .prototype button[type="button"]:hover {
+            background-color: #5a6268;
+        }
+
+        .prototype button.danger {
+            background-color: #dc3545;
+        }
+
+        .prototype button.danger:hover {
+            background-color: #c82333;
+        }
+
+        .prototype button.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .prototype button.warning:hover {
+            background-color: #e0a800;
+        }
+
+
+        .prototype .form-group {
+            margin-bottom: 20px;
+            /* Increase spacing */
+        }
+
+        .prototype .checkbox-group label {
+            display: inline-flex;
+            /* Use flex for better alignment */
+            align-items: center;
+            margin-right: 15px;
+            font-weight: normal;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .prototype .checkbox-group input {
+            margin-right: 8px;
+            /* Increase spacing */
+            vertical-align: middle;
+            /* Keep vertical alignment */
+            width: 16px;
+            /* Set explicit size */
+            height: 16px;
+        }
+
+        .prototype a {
+            color: #0056b3;
+            /* Darker blue link */
+            text-decoration: none;
+        }
+
+        .prototype a:hover {
+            text-decoration: underline;
+        }
+
+        .prototype small {
+            color: #6c757d;
+            display: block;
+            /* Make small text block for better spacing */
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+
+        .prototype .tab {
+            padding: 8px 15px;
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
+            /* Increase spacing */
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .prototype .tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: 600;
+        }
+
+
+        .er-diagram .entity {
+            border: 1px solid #adb5bd;
+            /* Softer border */
+            padding: 15px;
+            /* Increase padding */
+            margin: 10px;
+            display: inline-block;
+            background-color: white;
+            vertical-align: top;
+            border-radius: 6px;
+            /* Rounded corners */
+            min-width: 200px;
+            /* Adjust min-width */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .er-diagram .entity h4 {
+            margin: -15px -15px 10px -15px;
+            /* Adjust for padding */
+            padding: 10px 15px;
+            font-size: 1.05em;
+            /* Slightly larger */
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+            /* Softer border */
+            background-color: #f8f9fa;
+            /* Light header background */
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            color: #343a40;
+        }
+
+        .er-diagram .attributes {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .er-diagram .attributes li {
+            padding: 5px 5px;
+            /* Adjust padding */
+            font-size: 0.9em;
+            border-bottom: 1px dotted #e9ecef;
+            /* Lighter dots */
+            color: #495057;
+        }
+
+        .er-diagram .attributes li:last-child {
+            border-bottom: none;
+        }
+
+        .er-diagram .attributes b {
+            font-weight: 600;
+            /* Bolder PK */
+            color: #212529;
+        }
+
+        .er-diagram .attributes i {
+            font-style: normal;
+            /* Normal style for FK */
+            color: #007bff;
+            /* Blue color for FK */
+        }
+
+        .er-diagram .attributes small {
+            color: #6c757d;
+            margin-left: 8px;
+            font-size: 0.9em;
+        }
+
+        .er-diagram .relation-summary {
+            clear: both;
+            padding-top: 20px;
+            margin-top: 15px;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.95em;
+            color: #495057;
+        }
+
+        .er-diagram .relation-summary b {
+            color: #343a40;
+            font-weight: 600;
+        }
+
+
+        .flow-chart .step {
+            border: 1px solid #ced4da;
+            /* Softer border */
+            background-color: #f8f9fa;
+            /* Lighter background */
+            padding: 12px 15px;
+            /* Adjust padding */
+            margin: 10px auto;
+            /* Center steps horizontally */
+            text-align: center;
+            border-radius: 6px;
+            /* Rounded corners */
+            max-width: 80%;
+            /* Limit width */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            color: #495057;
+        }
+
+        /* Style for success/failure steps */
+        .flow-chart .step.success {
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+            color: #0f5132;
+        }
+
+        .flow-chart .step.failure {
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+            color: #842029;
+        }
+
+        .flow-chart .step.inline {
+            display: inline-block;
+            width: 48%;
+            vertical-align: top;
+            margin-left: 1%;
+            margin-right: 1%;
+            max-width: none;
+            /* Override max-width for inline */
+        }
+
+
+        .flow-chart .arrow {
+            text-align: center;
+            font-size: 1.6em;
+            /* Slightly larger arrow */
+            color: #adb5bd;
+            /* Lighter arrow color */
+            margin: 8px 0;
+            /* Adjust margin */
+            font-weight: bold;
+        }
+
+
+        .arch-diagram .component {
+            border: 1px solid #90cdf4;
+            /* Softer blue border */
+            background-color: #ebf8ff;
+            /* Lighter blue background */
+            padding: 15px 20px;
+            /* Adjust padding */
+            margin: 10px;
+            text-align: center;
+            border-radius: 6px;
+            /* Rounded corners */
+            display: inline-block;
+            vertical-align: top;
+            min-width: 180px;
+            /* Adjust min-width */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            color: #2c5282;
+            /* Darker blue text */
+        }
+
+        .arch-diagram .component small {
+            font-size: 0.85em;
+            color: #4a5568;
+            /* Gray color for description */
+            display: block;
+            margin-top: 5px;
+        }
+
+        .arch-diagram .layer {
+            border: 2px dashed #cbd5e0;
+            /* Softer dashed border */
+            padding: 25px;
+            /* Increase padding */
+            margin-bottom: 20px;
+            /* Adjust spacing */
+            text-align: center;
+            background-color: #f7fafc;
+            /* Very light gray background */
+            border-radius: 8px;
+            /* Rounded corners */
+        }
+
+        .arch-diagram .layer h4 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            /* Increase spacing after title */
+            color: #4a5568;
+            /* Darker gray title */
+            text-align: left;
+            border-bottom: none;
+            font-size: 1.2em;
+            /* Slightly larger title */
+            font-weight: 600;
+        }
+
+        .arch-diagram .connector {
+            text-align: center;
+            margin: 15px 0;
+            /* Increase spacing */
+            color: #718096;
+            /* Softer gray color */
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* User Info Avatar Styling */
+        .user-info .avatar-section {
+            text-align: center;
+            /* Center align content */
+            margin-bottom: 25px;
+            /* Add space below avatar */
+        }
+
+        .user-info img#current-avatar {
+            width: 100px;
+            /* Fixed width */
+            height: 100px;
+            /* Fixed height */
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 10px auto;
+            /* Center horizontally */
+            border: 2px solid #e2e8f0;
+            /* Add border */
+            background-color: #edf2f7;
+            /* Placeholder background */
+            object-fit: cover;
+            /* Ensure image covers the area */
+        }
+
+        .user-info label[for="avatar-upload"] {
+            cursor: pointer;
+            color: #0056b3;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 5px;
+            padding: 5px 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .user-info label[for="avatar-upload"]:hover {
+            background-color: #e9ecef;
+        }
+
+        .user-info input[type="file"]#avatar-upload {
+            display: none;
+            /* Hide default file input */
+        }
+
+        /* Account Security Section Styling */
+        .account-security .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dotted #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .account-security .setting-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .account-security label {
+            margin-bottom: 0;
+            /* Remove bottom margin for labels in this section */
+            font-weight: normal;
+            /* Normal weight */
+            color: #555;
+        }
+
+        .account-security span {
+            color: #333;
+            /* Darker color for value */
+            margin-left: 10px;
+        }
+
+        .account-security .setting-item button {
+            margin-right: 0;
+            /* Remove margin for buttons in this layout */
+            flex-shrink: 0;
+            /* Prevent button shrinking */
+            padding: 6px 12px;
+            /* Smaller buttons */
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>美食推荐项目概览</h1>
+
+    <!-- 框架图 -->
+    <h2>项目框架图 (Architecture Diagram)</h2>
+    <div class="diagram arch-diagram">
+        <div class="layer">
+            <h4>用户端 (Client)</h4>
+            <div class="component">Web App (React/Vue/Angular)<br><small>用户界面交互</small></div>
+            <div class="component">Mobile App (Optional)<br><small>原生移动端体验</small></div>
+        </div>
+        <div class="connector">↓↑ (HTTP/HTTPS API Calls via JSON)</div>
+        <div class="layer">
+            <h4>服务端 (Server)</h4>
+            <div class="component">API Gateway (Nginx/Kong)<br><small>请求路由, 负载均衡, 限流</small></div>
+            <div class="component">业务逻辑层 (Backend Service)<br><small>Node.js/Python/Java/Go</small>
+                <br>- 用户服务
+                <br>- 推荐服务
+                <br>- 搜索服务
+                <br>- 社区服务
+                <br>- 收藏服务
+            </div>
+            <div class="component">认证/授权服务 (Auth Service)<br><small>JWT/OAuth2</small></div>
+        </div>
+        <div class="connector">↓↑ (Database Connections, Cache Access, Message Queue)</div>
+        <div class="layer">
+            <h4>数据存储与处理层 (Data Storage & Processing)</h4>
+            <div class="component">关系型数据库 (RDBMS)<br><small>PostgreSQL/MySQL (核心业务数据)</small></div>
+            <div class="component">NoSQL数据库 (Optional)<br><small>MongoDB (如用户动态、评论)</small></div>
+            <div class="component">缓存 (Cache)<br><small>Redis (热点数据, Session)</small></div>
+            <div class="component">文件存储 (Object Storage)<br><small>S3/OSS (图片, 用户上传文件)</small></div>
+            <div class="component">搜索引擎 (Search Engine)<br><small>Elasticsearch (全文搜索, 筛选)</small></div>
+            <div class="component">消息队列 (Message Queue - Optional)<br><small>RabbitMQ/Kafka (异步任务, 解耦)</small></div>
+        </div>
+        <div class="connector">↓↑ (External APIs)</div>
+        <div class="layer">
+            <h4>第三方服务 (Third-party Services)</h4>
+            <div class="component">地图服务 (Map API)<br><small>高德/百度 (定位, 距离计算)</small></div>
+            <div class="component">短信/邮件服务 (SMS/Email)<br><small>验证码, 通知</small></div>
+            <div class="component">支付服务 (Payment Gateway - Optional)<br><small>支付宝/微信支付</small></div>
+            <div class="component">内容安全审核 (Optional)<br><small>文本/图片审核</small></div>
+        </div>
+    </div>
+
+    <!-- 业务流程图 -->
+    <h2>核心业务流程图 (Business Flow Diagram)</h2>
+    <div class="diagram flow-chart">
+        <h3>用户注册流程</h3>
+        <div class="step">用户访问注册页</div>
+        <div class="arrow">↓</div>
+        <div class="step">选择注册方式 (邮箱/手机)</div>
+        <div class="arrow">↓</div>
+        <div class="step">输入账号、密码、确认密码</div>
+        <div class="arrow">↓</div>
+        <div class="step">前端校验 (格式, 密码强度, 两次密码一致)</div>
+        <div class="arrow">↓</div>
+        <div class="step">获取验证码 (请求后端 -> 后端调用短信/邮件服务)</div>
+        <div class="arrow">↓</div>
+        <div class="step">用户输入验证码</div>
+        <div class="arrow">↓</div>
+        <div class="step">勾选同意用户协议</div>
+        <div class="arrow">↓</div>
+        <div class="step">提交注册信息 (含账号, 密码(加密后), 验证码)</div>
+        <div class="arrow">↓</div>
+        <div class="step">后端服务: 验证数据 (非空, 格式) -> 验证验证码 (与缓存/DB比对) -> 检查账号唯一性</div>
+        <div class="arrow">↓</div>
+        <div class="step inline success">✅ 验证通过 <br> -> 创建用户记录 (存储密码hash) <br> -> 清除验证码 <br> -> 返回成功响应 / 自动登录 / 跳转登录页
+        </div>
+        <div class="step inline failure">❌ 验证失败 <br> -> (如验证码错误/超时, 账号已存在, 密码不合规) <br> -> 返回具体错误信息给前端</div>
+
+        <h3 style="margin-top: 40px;">用户登录流程 (密码登录为例)</h3>
+        <div class="step">用户访问登录页</div>
+        <div class="arrow">↓</div>
+        <div class="step">输入账号 (邮箱/手机号)、密码</div>
+        <div class="arrow">↓</div>
+        <div class="step">(可选) 勾选"记住登录状态"</div>
+        <div class="arrow">↓</div>
+        <div class="step">(可选) 进行安全验证 (图形验证码/滑块)</div>
+        <div class="arrow">↓</div>
+        <div class="step">提交登录信息</div>
+        <div class="arrow">↓</div>
+        <div class="step">后端服务: 查找用户 -> 验证密码 (比对hash)</div>
+        <div class="arrow">↓</div>
+        <div class="step inline success">✅ 验证成功 <br> -> 生成认证 Token (JWT) <br> -> (可选) 记录登录时间/IP <br> -> 返回 Token
+            及用户信息给前端</div>
+        <div class="step inline failure">❌ 验证失败 <br> -> (用户不存在/密码错误) <br> -> (可选) 增加登录失败计数 (防暴力破解) <br> -> 返回错误信息</div>
+        <div class="arrow">↓</div>
+        <div class="step">前端处理: 存储 Token (localStorage/sessionStorage) -> 根据"记住状态"设置有效期 -> 跳转到用户首页/目标页</div>
+        <div class="step" style="margin-top: 10px;">(流程分支) 用户点击 "忘记密码?" -> 进入密码找回流程</div>
+        <div class="step" style="margin-top: 10px;">(流程分支) 用户选择 "验证码登录" -> 进入验证码登录流程 (类似注册获取验证码)</div>
+
+
+        <h3 style="margin-top: 40px;">美食推荐流程 (简化)</h3>
+        <div class="step">用户打开App/网页 -> 触发推荐请求 (可能带用户ID, 位置信息)</div>
+        <div class="arrow">↓</div>
+        <div class="step">(可选) 用户在界面选择筛选/排序条件 (菜系, 距离, 评分等) -> 发送带参数请求</div>
+        <div class="arrow">↓</div>
+        <div class="step">后端推荐服务: <br> 1. 获取用户信息 (ID, 历史行为: 浏览/收藏/评价) <br> 2. 获取位置信息 (如有) <br> 3. 获取筛选条件</div>
+        <div class="arrow">↓</div>
+        <div class="step">调用推荐算法: <br> - 基于内容 (匹配餐厅标签/菜系) <br> - 协同过滤 (查找相似用户/物品) <br> - 基于地理位置 (附近推荐) <br> - 结合热门度/评分等
+            <br> => 生成候选推荐列表
+        </div>
+        <div class="arrow">↓</div>
+        <div class="step">对列表进行排序/过滤 (如排除已评价/不感兴趣) -> 生成最终推荐结果 (餐厅ID列表)</div>
+        <div class="arrow">↓</div>
+        <div class="step">查询数据库/缓存获取推荐餐厅的详细信息 (名称, 图片, 评分等)</div>
+        <div class="arrow">↓</div>
+        <div class="step">返回格式化后的推荐数据给前端</div>
+        <div class="arrow">↓</div>
+        <div class="step">前端界面渲染展示推荐列表</div>
+
+        <p style="margin-top: 20px; text-align: center;"><i>(其他核心流程如搜索、发布动态、收藏管理等可按此模式进行细化)</i></p>
+    </div>
+
+    <!-- 数据库ER图 -->
+    <h2>数据库ER图 (Database ER Diagram - Conceptual)</h2>
+    <div class="diagram er-diagram">
+        <p style="text-align: center; margin-bottom: 15px;"><i>(展示核心实体及其关键属性和关系。具体字段类型、索引等需在详细设计中确定。)</i></p>
+        <div class="entity">
+            <h4>Users (用户表)</h4>
+            <ul class="attributes">
+                <li><b>user_id (PK)</b> <small>自增ID/UUID</small></li>
+                <li>username <small>昵称</small></li>
+                <li>email <small>邮箱 (Unique, Indexed)</small></li>
+                <li>phone_number <small>手机号 (Unique, Indexed)</small></li>
+                <li>password_hash <small>密码哈希</small></li>
+                <li>avatar_url <small>头像地址</small></li>
+                <li>bio <small>个人简介</small></li>
+                <li>gender <small>性别</small></li>
+                <li>birthdate <small>生日</small></li>
+                <li>registration_date <small>注册时间</small></li>
+                <li>last_login_date <small>最后登录时间</small></li>
+                <li>status <small>账号状态 (正常, 禁用)</small></li>
+                <li>created_at</li>
+                <li>updated_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Restaurants (餐厅表)</h4>
+            <ul class="attributes">
+                <li><b>restaurant_id (PK)</b></li>
+                <li>name <small>餐厅名称 (Indexed)</small></li>
+                <li>description <small>描述</small></li>
+                <li>address <small>地址</small></li>
+                <li>latitude <small>纬度 (Indexed)</small></li>
+                <li>longitude <small>经度 (Indexed)</small></li>
+                <li><i>city_id (FK)</i> <small>所属城市 (Optional)</small></li>
+                <li>cuisine_tags <small>菜系/口味标签 (JSON/数组/关联表)</small></li>
+                <li>scene_tags <small>场景标签 (早餐/午餐/晚餐/约会)</small></li>
+                <li>feature_tags <small>特色标签 (网红/小吃/老字号)</small></li>
+                <li>average_rating <small>平均评分 (冗余或计算)</small></li>
+                <li>price_per_capita <small>人均价格</small></li>
+                <li>opening_hours <small>营业时间</small></li>
+                <li>phone <small>联系电话</small></li>
+                <li>cover_image_url <small>封面图</small></li>
+                <li>status <small>状态(营业中/休息/关闭)</small></li>
+                <li>created_at</li>
+                <li>updated_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Dishes (菜品表 - 可选)</h4>
+            <ul class="attributes">
+                <li><b>dish_id (PK)</b></li>
+                <li><i>restaurant_id (FK, Indexed)</i></li>
+                <li>name <small>菜品名称</small></li>
+                <li>description <small>描述</small></li>
+                <li>price <small>价格</small></li>
+                <li>image_url <small>图片</small></li>
+                <li>tags <small>标签 (推荐菜/新品)</small></li>
+                <li>created_at</li>
+                <li>updated_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Reviews (评价表)</h4>
+            <ul class="attributes">
+                <li><b>review_id (PK)</b></li>
+                <li><i>user_id (FK, Indexed)</i></li>
+                <li><i>restaurant_id (FK, Indexed)</i></li>
+                <li>rating <small>评分 (1-5)</small></li>
+                <li>comment <small>评论内容</small></li>
+                <li>image_urls <small>评价图片 (JSON/数组)</small></li>
+                <li>review_date <small>评价时间 (Indexed)</small></li>
+                <li>status <small>状态(显示/隐藏/审核中)</small></li>
+                <li>created_at</li>
+                <li>updated_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Collections (收藏表)</h4>
+            <ul class="attributes">
+                <li><b>collection_id (PK)</b></li>
+                <li><i>user_id (FK, Indexed)</i></li>
+                <li><i>restaurant_id (FK, Indexed)</i></li>
+                <li><i>collection_folder_id (FK, Optional)</i><small>收藏夹ID</small></li>
+                <li>collection_date <small>收藏时间 (Indexed)</small></li>
+                <li>notes <small>备注 (Optional)</small></li>
+                <li>created_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Collection_Folders (收藏夹表 - 可选)</h4>
+            <ul class="attributes">
+                <li><b>folder_id (PK)</b></li>
+                <li><i>user_id (FK, Indexed)</i></li>
+                <li>name <small>收藏夹名称</small></li>
+                <li>description <small>描述</small></li>
+                <li>is_public <small>是否公开</small></li>
+                <li>created_at</li>
+                <li>updated_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Posts (社区动态表)</h4>
+            <ul class="attributes">
+                <li><b>post_id (PK)</b></li>
+                <li><i>user_id (FK, Indexed)</i></li>
+                <li>content <small>文字内容</small></li>
+                <li>image_urls <small>图片地址列表 (JSON/数组)</small></li>
+                <li>video_url <small>视频地址 (Optional)</small></li>
+                <li>location_name <small>位置标记名称</small></li>
+                <li>latitude <small>纬度</small></li>
+                <li>longitude <small>经度</small></li>
+                <li>tags <small>标签 (JSON/数组/关联表)</small></li>
+                <li>visibility <small>可见性 (公开/好友/私密)</small></li>
+                <li>like_count <small>点赞数 (冗余)</small></li>
+                <li>comment_count <small>评论数 (冗余)</small></li>
+                <li>status <small>状态(正常/审核中/已删除)</small></li>
+                <li>created_at <small>(Indexed)</small></li>
+                <li>updated_at</li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Comments (评论表)</h4>
+            <ul class="attributes">
+                <li><b>comment_id (PK)</b></li>
+                <li><i>post_id (FK, Indexed)</i> <small>关联动态</small></li>
+                <li><i>review_id (FK, Indexed, Optional)</i> <small>关联评价</small></li>
+                <li><i>user_id (FK, Indexed)</i> <small>评论者</small></li>
+                <li><i>parent_comment_id (FK, Optional)</i> <small>回复的评论ID</small></li>
+                <li>content <small>评论内容</small></li>
+                <li>status <small>状态(正常/审核中/已删除)</small></li>
+                <li>created_at <small>(Indexed)</small></li>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Likes (点赞表)</h4>
+            <ul class="attributes">
+                <li><b>like_id (PK)</b></li>
+                <li><i>user_id (FK, Indexed)</i></li>
+                <li>target_type <small>点赞对象类型 ('post', 'comment', 'review') (Indexed)</small></li>
+                <li>target_id <small>点赞对象ID (Indexed)</small></li>
+                <li>created_at</li>
+                <small>组合唯一索引 (user_id, target_type, target_id)</small>
+            </ul>
+        </div>
+        <div class="entity">
+            <h4>Follows (关注关系表)</h4>
+            <ul class="attributes">
+                <li><b>follow_id (PK)</b></li>
+                <li><i>follower_user_id (FK, Indexed)</i> <small>关注者</small></li>
+                <li><i>following_user_id (FK, Indexed)</i> <small>被关注者</small></li>
+                <li>created_at</li>
+                <small>组合唯一索引 (follower_user_id, following_user_id)</small>
+            </ul>
+        </div>
+        <div class="relation-summary">
+            <b>主要关系 (一对多 / 多对多):</b><br>
+            - Users(1) -- (*) Reviews, Collections, Posts, Comments, Likes, Follows (作为关注者或被关注者), Collection_Folders<br>
+            - Restaurants(1) -- (*) Dishes, Reviews, Collections<br>
+            - Posts(1) -- (*) Comments, Likes<br>
+            - Reviews(1) -- (*) Comments, Likes<br>
+            - Comments(1) -- (*) Likes, Comments (自关联形成回复)<br>
+            - Collection_Folders(1) -- (*) Collections (一个收藏夹包含多个收藏项)<br>
+            <i>(注: FK = Foreign Key 外键, PK = Primary Key 主键, (*) 表示 '多' 端)</i>
+        </div>
+    </div>
+
+    <!-- 前端原型图 -->
+    <h2>前端原型图 - 用户管理模块</h2>
+    <div class="prototype">
+        <h3>1. 注册功能</h3>
+        <section>
+            <h4>注册新用户</h4>
+            <form onsubmit="alert('模拟提交注册信息'); return false;">
+                <div class="form-group">
+                    <label for="reg-method">注册方式:</label>
+                    <select id="reg-method" name="reg_method">
+                        <option value="email" selected>邮箱注册</option>
+                        <option value="phone">手机号注册</option>
+                    </select>
+                </div>
+                <div class="form-group" id="reg-email-group">
+                    <label for="reg-email">邮箱:</label>
+                    <input type="email" id="reg-email" name="email" placeholder="请输入常用邮箱地址" required>
+                </div>
+                <div class="form-group" id="reg-phone-group" style="display: none;"> <!-- 根据选择显示/隐藏 -->
+                    <label for="reg-phone">手机号:</label>
+                    <input type="tel" id="reg-phone" name="phone" placeholder="请输入手机号码">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">设置密码:</label>
+                    <input type="password" id="reg-password" name="password" placeholder="8-20位，至少包含字母和数字" required
+                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$" autocomplete="new-password">
+                    <small>密码强度: <span id="pwd-strength" style="font-weight:bold;"></span></small>
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm-password">确认密码:</label>
+                    <input type="password" id="reg-confirm-password" name="confirm_password" placeholder="请再次输入密码"
+                        required autocomplete="new-password">
+                    <small id="confirm-pwd-msg" style="color: red;"></small>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <label for="reg-captcha" style="flex-shrink: 0; margin-bottom: 0;">验证码:</label>
+                    <input type="text" id="reg-captcha" name="captcha" placeholder="请输入验证码" required
+                        style="flex-grow: 1; margin-bottom: 0;">
+                    <button type="button" onclick="alert('模拟发送验证码到邮箱/手机')">获取验证码</button>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="reg-terms" name="terms" required>
+                    <label for="reg-terms">我已阅读并同意 <a href="#terms" target="_blank">《用户服务协议》</a> 和 <a href="#privacy"
+                            target="_blank">《隐私政策》</a></label>
+                </div>
+                <button type="submit">立即注册</button>
+                <p style="margin-top: 15px;">已有账号？ <a href="#login">直接登录</a></p>
+            </form>
+        </section>
+
+        <h3 id="login">2. 登录功能</h3>
+        <section>
+            <h4>用户登录</h4>
+            <form onsubmit="alert('模拟提交登录信息'); return false;">
+                <!-- 登录方式切换 -->
+                <div style="margin-bottom: 15px;">
+                    <button type="button" id="login-tab-password" class="tab active"
+                        onclick="switchLoginMethod('password')">密码登录</button>
+                    <button type="button" id="login-tab-captcha" class="tab"
+                        onclick="switchLoginMethod('captcha')">验证码登录</button>
+                </div>
+
+                <div id="login-method-password">
+                    <div class="form-group">
+                        <label for="login-account-pwd">账号:</label>
+                        <input type="text" id="login-account-pwd" name="account_pwd" placeholder="请输入邮箱或手机号" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码:</label>
+                        <input type="password" id="login-password" name="password" placeholder="请输入密码" required
+                            autocomplete="current-password">
+                    </div>
+                </div>
+
+                <div id="login-method-captcha" style="display: none;">
+                    <div class="form-group">
+                        <label for="login-account-captcha">手机号:</label>
+                        <input type="tel" id="login-account-captcha" name="account_captcha" placeholder="请输入注册手机号">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <label for="login-captcha" style="flex-shrink: 0; margin-bottom: 0;">验证码:</label>
+                        <input type="text" id="login-captcha" name="login_captcha" placeholder="请输入验证码"
+                            style="flex-grow: 1; margin-bottom: 0;">
+                        <button type="button" onclick="alert('模拟发送登录验证码')">获取验证码</button>
+                    </div>
+                </div>
+
+                <!-- 可选：安全验证，如图形验证码/滑块 -->
+                <!-- <div class="form-group"> ... 安全验证 ... </div> -->
+
+                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="login-remember" name="remember">
+                        <label for="login-remember">记住登录状态</label>
+                    </div>
+                    <a href="#forgot-password">忘记密码？</a>
+                </div>
+                <button type="submit">登录</button>
+
+                <p style="margin-top: 15px;">还没有账号？ <a href="#register">免费注册</a></p>
+
+                <!-- 可选：第三方登录 -->
+                <div style="margin-top: 25px; text-align: center; border-top: 1px solid #eee; padding-top: 15px;">
+                    <p style="color: #6c757d; margin-bottom: 10px;">--- 其他登录方式 ---</p>
+                    <button type="button"
+                        style="background: #eee; color: #333; border: 1px solid #ccc; margin: 5px; border-radius: 50%; width: 40px; height: 40px; padding: 0;">WX</button>
+                    <button type="button"
+                        style="background: #eee; color: #333; border: 1px solid #ccc; margin: 5px; border-radius: 50%; width: 40px; height: 40px; padding: 0;">QQ</button>
+                    <!-- Add more social login buttons as needed -->
+                </div>
+            </form>
+        </section>
+
+        <h3 id="forgot-password">密码找回 (流程原型)</h3>
+        <section>
+            <h4>找回密码 - 步骤1: 验证身份</h4>
+            <form onsubmit="alert('模拟提交验证身份信息'); return false;">
+                <div class="form-group">
+                    <label for="forgot-account">注册时使用的邮箱/手机号:</label>
+                    <input type="text" id="forgot-account" name="forgot_account" placeholder="请输入您的邮箱或手机号" required>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <label for="forgot-captcha" style="flex-shrink: 0; margin-bottom: 0;">验证码:</label>
+                    <input type="text" id="forgot-captcha" name="forgot_captcha" placeholder="请输入收到的验证码" required
+                        style="flex-grow: 1; margin-bottom: 0;">
+                    <button type="button" onclick="alert('模拟向邮箱/手机发送找回密码验证码')">获取验证码</button>
+                </div>
+                <button type="submit">下一步：重设密码</button>
+            </form>
+            <hr style="margin: 25px 0;">
+            <h4>找回密码 - 步骤2: 重设新密码</h4>
+            <form onsubmit="alert('模拟提交新密码'); return false;">
+                <div class="form-group">
+                    <label for="new-password">新密码:</label>
+                    <input type="password" id="new-password" name="new_password" placeholder="设置您的新密码 (8-20位)" required
+                        autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-new-password">确认新密码:</label>
+                    <input type="password" id="confirm-new-password" name="confirm_new_password" placeholder="请再次输入新密码"
+                        required autocomplete="new-password">
+                </div>
+                <button type="submit">确认修改</button>
+            </form>
+        </section>
+
+        <h3>3. 个人信息管理</h3>
+        <section>
+            <h4>基本信息</h4>
+            <form class="user-info" onsubmit="alert('模拟保存基本信息'); return false;">
+                <div class="form-group avatar-section">
+                    <!-- Replace Base64 PNG with SVG placeholder -->
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2EwYWRiZiIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtdXNlci1jaXJjbGUiPjxwYXRoIGQ9Ik0xOCA5YTggOCAwIDAgMC0xMS4xIDBjMi40IDQgNy42IDQgMTEuMSAwbjExYS41LjUgMCAwIDAgLjQ2LS44NGMtLjUtMS4zLTMtMy40LTUuODYtMy40cy01LjM2IDIuMS01Ljg2IDMuNGEuNS41IDAgMCAwIC40Ni44NGwxMS4xLS4wNFoiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg=="
+                        alt="用户头像" id="current-avatar">
+                    <label for="avatar-upload">点击更换头像</label>
+                    <input type="file" id="avatar-upload" name="avatar" accept="image/*">
+                    <small>支持 JPG, PNG, GIF 格式，大小不超过 2MB</small>
+                </div>
+                <div class="form-group">
+                    <label for="info-nickname">昵称:</label>
+                    <input type="text" id="info-nickname" name="nickname" value="美味探索家" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="info-bio">个人简介:</label>
+                    <textarea id="info-bio" name="bio" rows="3" maxlength="100"
+                        placeholder="介绍一下自己吧~">爱生活，爱美食！</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="info-gender">性别:</label>
+                    <select id="info-gender" name="gender">
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                        <option value="other">其他</option>
+                        <option value="private" selected>保密</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="info-birthdate">生日:</label>
+                    <input type="date" id="info-birthdate" name="birthdate">
+                </div>
+                <div class="form-group">
+                    <label for="info-city">所在城市:</label>
+                    <input type="text" id="info-city" name="city" placeholder="例如：北京">
+                </div>
+                <button type="submit">保存基本信息</button>
+            </form>
+        </section>
+        <section>
+            <h4>隐私设置</h4>
+            <form onsubmit="alert('模拟保存隐私设置'); return false;">
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="privacy-profile" name="privacy_profile" checked>
+                    <label for="privacy-profile">允许他人查看我的主页</label>
+                    <small style="display: inline; margin-left: 5px;">(主页将展示您的昵称、头像、简介、动态等)</small>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="privacy-collections" name="privacy_collections" checked>
+                    <label for="privacy-collections">公开我的收藏夹</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="privacy-location" name="privacy_location">
+                    <label for="privacy-location">在动态中隐藏我的具体位置</label>
+                    <small style="display: inline; margin-left: 5px;">(开启后仅显示城市)</small>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="privacy-stranger-msg" name="privacy_stranger_msg">
+                    <label for="privacy-stranger-msg">不接收未关注人的私信</label>
+                </div>
+                <button type="submit">保存隐私设置</button>
+            </form>
+        </section>
+        <section>
+            <h4>账号安全</h4>
+            <div class="account-security">
+                <div class="setting-item">
+                    <div>
+                        <label>登录密码:</label>
+                        <span>已设置</span>
+                    </div>
+                    <button type="button" onclick="alert('弹出修改密码弹窗/页面')">修改</button>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <label>绑定邮箱:</label>
+                        <span>us***@example.com</span> <!-- Masked email -->
+                    </div>
+                    <button type="button" onclick="alert('弹出修改/解绑邮箱流程')">修改/解绑</button>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <label>绑定手机:</label>
+                        <span>138****1234</span> <!-- Masked phone -->
+                    </div>
+                    <button type="button" onclick="alert('弹出修改/解绑手机流程')">修改/解绑</button>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <label>第三方账号绑定:</label>
+                        <span>已绑定微信</span> <!-- Show connected accounts -->
+                    </div>
+                    <button type="button" onclick="alert('跳转到第三方账号管理页面')">管理</button>
+                </div>
+                <div class="setting-item">
+                    <div>
+                        <label>登录设备管理:</label>
+                        <span>当前设备：Windows Chrome</span>
+                    </div>
+                    <button type="button" class="warning" onclick="alert('显示登录设备管理列表')">管理</button>
+                </div>
+                <div class="form-group" style="margin-top: 20px; text-align: right;">
+                    <button type="button" class="danger"
+                        onclick="if(confirm('确定要注销您的账号吗？此操作将永久删除您的所有数据且无法恢复！')) { alert('进入账号注销流程...') }">申请注销账号</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 主页 原型 -->
+    <h2>前端原型图 - 主页 (Home Page)</h2>
+    <div class="prototype">
+        <section>
+            <h4>页面顶部</h4>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                <span>📍 城市: 北京</span>
+                <input type="text" placeholder="搜索餐厅、菜品、地点..." style="flex-grow: 1; margin: 0 15px; padding: 8px 12px;">
+                <button type="button" style="padding: 8px 15px;">搜索</button>
+            </div>
+        </section>
+
+        <section>
+            <h4>快速分类入口</h4>
+            <div
+                style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM0YTljZTUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWN1aXNpbmUtY2hpbmVzZSI+PHBhdGggZD0iTTEyIDV2MTIiLz48cGF0aCBkPSJtMTggOS0xLjkyIDIuNjZhMyAzIDAgMSAxLTIuMTYgMi4xNkwwIDE4Ii8+PHBhdGggZD0iTTggMTFjMCAzIDQtMy41IDQgNS41Ii8+PHBhdGggZD0iTTggN2MwIDAtMi0xLTMuNS0xUzEgNyAxIDEyYzAgNSAyLjUgOCAzLjUgOGguNWEzIDMgMCAwIDAgMy0zVjciLz48L3N2Zz4="
+                        alt="中餐"><br><span>中餐</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZDk2NDEiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXBpenphIj48cGF0aCBkPSJNNiAzLjU3QTE3LjMgMTcuMyAwIDAgMSAyIDguMzUiLz48cGF0aCBkPSJNMjIgOC4zNUE3LjUgNy41IDAgMCAwIDE0IDNhMTcuMyAxNy4zIDAgMCAxIDggNS4zNVoiLz48cGF0aCBkPSJNMiAxNS42NUEzMy4zIDMzLjMgMCAwIDEgMTIgMjEgMzMuMyAzMy4zIDAgMCAxIDIyIDE1LjY1Ii8+PHBhdGggZD0ibTIgOC4zNSA5LTIuNjUiLz48cGF0aCBkPSJtMjIgOC4zNS05LTIuNjUiLz48cGF0aCBkPSJNMTIgMjF2LTguNSIvPjxwYXRoIGQ9Ik0xMSAxMy41YTEgMSAwIDEgMCAyIDAgMSAxIDAgMSAwLTItLjVaIi8+PHBhdGggZD0ibTcuNSAxNCAxLTEuMiIvPjxwYXRoIGQ9Ik0xNS41IDE0bC0xLTEuMiIvPjwvc3ZnPg=="
+                        alt="西餐"><br><span>西餐</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNlNTc4NjMiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNvdXAtYm93bCI+PHBhdGggZD0iTTQgMTFhOCA4IDAgMSAxIDE2IDBIMjJhOCA4IDAgMCAwLTguMDctNy45NEExMiAxMiAwIDAgMCAxMiAyQTYgNiAwIDAgMCA3LjIgNC42Ii8+PHBhdGggZD0iTTcuNTIgNC4xOEEzIDMgMCAxIDEgMTEgNyIvPjxwYXRoIGQ9Ik0xNyAzYTMgMyAwIDEgMCAwIDYiLz48L3N2Zz4="
+                        alt="日料"><br><span>日料</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGI4YWUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNhZmVzZXJ2ZXIiPjxwYXRoIGQ9Ik0xOCAzYTQgNCAwIDAgMSAwIDgiLz48cGF0aCBkPSJNNiAzYTYgNiAwIDAgMSA2IDZjNiAwIDYgMiA2IDR2MyIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xNyA4djgiLz48cGF0aCBkPSJNMCAxOWgxOGExIDAgMCAwIDEgMUgyMCIvPjwvc3ZnPg=="
+                        alt="咖啡厅"><br><span>咖啡厅</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNiMjc3ZmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWljZS1jcmVhbSI+PHBhdGggZD0iTTE3LjIgMy43YTguNSA4LjUgMCAwIDEgMCAxNC42Ii8+PHBhdGggZD0iTTYuOCA4LjVhOC41IDguNSAwIDEgMCAxNC42IDBjMCAuNzctLjA5IDEuNTItLjI2IDIuMjQiLz48cGF0aCBkPSJNNi44IDE4LjNhOC41IDguNSAwIDAgMSAwLTE0LjYiLz48cGF0aCBkPSJNMCA4aDI0Ii8+PHBhdGggZD0ibTE1IDZhMSAxIDAgMSAwLTIgMCYjeDk7YTEgMSAwIDEgMCAyIDBaIi8+PHBhdGggZD0ibTkgMTNhMiAyIDAgMSAxIDQgMGEyIDIgMCAxIDEtNCAwWiIvPjwvc3ZnPg=="
+                        alt="甜点"><br><span>甜点</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMGM3YmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLW1hcC1waW4iPjxwYXRoIGQ9Ik0yMCAxMGMwIDYtOCAxMS04IDExcy04LTUtOC0xMWE4IDggMCAwIDEgMTYgMFoiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEwIiByPSIzIi8+PC9zdmc+"
+                        alt="附近"><br><span>附近美食</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmNGEzMTUiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWZsYW1lIj48cGF0aCBkPSJNMjEgMTNjLTMuMyAxLjctMy4zIDUuNyAwIDcuNE0zIDEzYzMuMyAxLjcgMy4zIDUuNyAwIDcuNG02IDBjMy4zLTEuNyAzLjMtNS43IDAtNy40Ii8+PHBhdGggZD0iTTEyIDIxYzEuNS0yIDIuOC00LjMtMy02LjYtNC4yLTQuNi0xLjgtOC40LTMuNy04LjRIMTljLTIgMC43LTguMiAyLjItMTEuNSA1LjUtMS4yIDEuMi0yIDMuMS0yIDQuOUE4LjggOC44IDAgMCAwIDEyIDIxWiIvPjwvc3ZnPg=="
+                        alt="热门"><br><span>热门榜单</span></div>
+                <div><img
+                        src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM2YzdiZTkiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWdyaWQtMiYjeDIwMGU7JiN4MjAwZTt4MiI+PHJlY3Qgd2lkdGg9IjgiIGhlaWdodD0iOCIgeD0iMyIgeT0iMyIgcng9IjEiLz48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB4PSIxMyIgeT0iMyIgcng9IjEiLz48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB4PSIzIiB5PSIxMyIgcng9IjEiLz48cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB4PSIxMyIgeT0iMTMiIHJ4PSIxIi8+PC9zdmc+"
+                        alt="全部分类"><br><span>全部分类</span></div>
+            </div>
+        </section>
+
+        <section>
+            <h4>猜你喜欢 (个性化推荐)</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <!-- Recommendation Card 1 -->
+                <div
+                    style="border: 1px solid #eee; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMTUiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2Q5ZGFlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                        alt="美食图片" style="width: 100%; height: 120px; object-fit: cover;">
+                    <div style="padding: 10px 15px;">
+                        <h5 style="margin: 0 0 5px 0;">老北京炸酱面 (鼓楼店)</h5>
+                        <div>⭐⭐⭐⭐⭐ 4.8分 | 人均 ¥35</div>
+                        <div style="margin-top: 5px;"><span
+                                style="background: #e7f5ff; color: #1c7ed6; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-right: 5px;">京菜</span><span
+                                style="background: #fff3bf; color: #f59f00; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">老字号</span>
+                        </div>
+                        <div style="margin-top: 5px; color: #888; font-size: 0.9em;">📍 鼓楼大街 | 1.2km</div>
+                    </div>
+                </div>
+                <!-- Recommendation Card 2 -->
+                <div
+                    style="border: 1px solid #eee; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMTUiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2Q5ZGFlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                        alt="美食图片" style="width: 100%; height: 120px; object-fit: cover;">
+                    <div style="padding: 10px 15px;">
+                        <h5 style="margin: 0 0 5px 0;">川味观火锅 (三里屯店)</h5>
+                        <div>⭐⭐⭐⭐☆ 4.5分 | 人均 ¥120</div>
+                        <div style="margin-top: 5px;"><span
+                                style="background: #ffe3e3; color: #e03131; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-right: 5px;">火锅</span><span
+                                style="background: #d0ebff; color: #1971c2; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">朋友聚餐</span>
+                        </div>
+                        <div style="margin-top: 5px; color: #888; font-size: 0.9em;">📍 三里屯太古里 | 5.5km</div>
+                    </div>
+                </div>
+                <!-- Add more cards -->
+                <div
+                    style="border: 1px solid #eee; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMTUiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2Q5ZGFlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                        alt="美食图片" style="width: 100%; height: 120px; object-fit: cover;">
+                    <div style="padding: 10px 15px;">
+                        <h5 style="margin: 0 0 5px 0;">深夜食堂日料</h5>
+                        <div>⭐⭐⭐⭐⭐ 4.9分 | 人均 ¥90</div>
+                        <div style="margin-top: 5px;"><span
+                                style="background: #e5dbff; color: #5f3dc4; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-right: 5px;">日料</span><span
+                                style="background: #d3f9d8; color: #2f9e44; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">居酒屋</span>
+                        </div>
+                        <div style="margin-top: 5px; color: #888; font-size: 0.9em;">📍 朝阳大悦城 | 8.1km</div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;"><a href="#discover">查看更多推荐 &gt;</a></div>
+        </section>
+
+        <section>
+            <h4>附近热门</h4>
+            <!-- Similar card layout as above, filtered by distance and popularity -->
+            <p><i>(此处展示附近热门餐厅卡片列表...)</i></p>
+        </section>
+
+        <section>
+            <h4>社区精选 (最新动态)</h4>
+            <!-- Display latest community posts, maybe smaller cards linking to full post -->
+            <div style="border-top: 1px solid #eee; padding-top: 15px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNhMGFkYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItY2lyY2xlIj48cGF0aCBkPSJNMTggOWE4IDggMCAwIDAtMTEuMSAwdjExYS41LjUgMCAwIDAgLjQ2LS44NGMtLjUtMS4zLTMtMy40LTUuODYtMy40cy01LjM2IDIuMS01Ljg2IDMuNGEuNS41IDAgMCAwIC40Ni44NGwxMS4xLS4wNFoiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg=="
+                        alt="User Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                    <div>
+                        <span style="font-weight: bold;">爱吃的猫</span> <small> 5分钟前</small>
+                        <p style="margin: 5px 0 0 0;">今天打卡了这家网红蛋糕店，颜值爆表！味道也不错😋 #甜点 #下午茶 <a
+                                href="#post-detail">...查看全文</a></p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNhMGFkYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItY2lyY2xlIj48cGF0aCBkPSJNMTggOWE4IDggMCAwIDAtMTEuMSAwdjExYS41LjUgMCAwIDAgLjQ2LS44NGMtLjUtMS4zLTMtMy40LTUuODYtMy40cy01LjM2IDIuMS01Ljg2IDMuNGEuNS41IDAgMCAwIC40Ni44NGwxMS4xLS4wNFoiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg=="
+                        alt="User Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                    <div>
+                        <span style="font-weight: bold;">隔壁老王</span> <small> 1小时前</small>
+                        <p style="margin: 5px 0 0 0;">周末聚餐，还是得吃火锅！这家毛肚绝了！📍川味观 <a href="#post-detail">...查看全文</a></p>
+                    </div>
+                </div>
+                <!-- More posts -->
+                <div style="text-align: center; margin-top: 20px;"><a href="#community">进入美食社区 &gt;</a></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 发现美食 原型 -->
+    <h2 id="discover">前端原型图 - 发现美食 (Discover Page)</h2>
+    <div class="prototype">
+        <section>
+            <h4>筛选与排序</h4>
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                <div>
+                    <label for="filter-cuisine">菜系:</label>
+                    <select id="filter-cuisine" name="cuisine">
+                        <option value="all">全部菜系</option>
+                        <option value="chinese">中餐</option>
+                        <option value="western">西餐</option>
+                        <option value="japanese">日料</option>
+                        <option value="korean">韩料</option>
+                        <option value="hotpot">火锅</option>
+                        <option value="bbq">烧烤</option>
+                        <option value="dessert">甜点饮品</option>
+                        <!-- More options -->
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-scene">场景:</label>
+                    <select id="filter-scene" name="scene">
+                        <option value="all">全部分类</option>
+                        <option value="breakfast">早餐</option>
+                        <option value="lunch">午餐</option>
+                        <option value="dinner">晚餐</option>
+                        <option value="dating">情侣约会</option>
+                        <option value="gathering">朋友聚餐</option>
+                        <option value="family">家庭聚会</option>
+                        <!-- More options -->
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-price">价格区间:</label>
+                    <select id="filter-price" name="price">
+                        <option value="all">不限</option>
+                        <option value="0-50">¥50以下</option>
+                        <option value="50-100">¥50-100</option>
+                        <option value="100-200">¥100-200</option>
+                        <option value="200+">¥200以上</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-rating">评分:</label>
+                    <select id="filter-rating" name="rating">
+                        <option value="all">不限</option>
+                        <option value="4.5+">4.5分以上</option>
+                        <option value="4.0+">4.0分以上</option>
+                        <option value="3.5+">3.5分以上</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-distance">距离:</label>
+                    <select id="filter-distance" name="distance">
+                        <option value="all">不限</option>
+                        <option value="1km">1km以内</option>
+                        <option value="3km">3km以内</option>
+                        <option value="5km">5km以内</option>
+                        <option value="10km">10km以内</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="filter-features">特色:</label>
+                    <!-- Could be checkboxes or multi-select -->
+                    <input type="text" id="filter-features" name="features" placeholder="如: 网红, 小吃, 老字号...">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <label for="sort-by" style="display: inline-block; margin-right: 10px;">排序方式:</label>
+                    <select id="sort-by" name="sort">
+                        <option value="smart">智能排序 (默认)</option>
+                        <option value="distance">距离优先</option>
+                        <option value="rating">评分最高</option>
+                        <option value="price_asc">价格最低</option>
+                        <option value="price_desc">价格最高</option>
+                        <option value="popular">人气最高</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="button">地图模式</button> <!-- Optional Map View Toggle -->
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h4>美食列表</h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <!-- Discover Item Card 1 -->
+                <div
+                    style="border: 1px solid #eee; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMTUiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2Q5ZGFlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                        alt="美食图片" style="width: 100%; height: 160px; object-fit: cover;">
+                    <div
+                        style="padding: 10px 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h5 style="margin: 0 0 5px 0;">精致意面餐厅</h5>
+                            <div style="margin-bottom: 5px;">⭐⭐⭐⭐⭐ 4.9分 | 人均 ¥150</div>
+                            <p style="font-size: 0.9em; color: #666; margin: 0 0 8px 0; line-height: 1.4;">
+                                地道罗马风味，手工意面是特色，环境优雅适合约会。</p>
+                            <div style="margin-bottom: 8px;"><span
+                                    style="background: #e7f5ff; color: #1c7ed6; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-right: 5px;">西餐</span><span
+                                    style="background: #ffec99; color: #e67700; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">约会</span><span
+                                    style="background: #d3f9d8; color: #2f9e44; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-left: 5px;">环境好</span>
+                            </div>
+                        </div>
+                        <div style="color: #888; font-size: 0.9em;">📍 CBD国贸 | 3.5km <button type="button"
+                                style="float: right; padding: 3px 8px; font-size: 0.8em; background-color: #f1f3f5; color: #495057;">收藏</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Discover Item Card 2 -->
+                <div
+                    style="border: 1px solid #eee; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMTUiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2Q5ZGFlMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                        alt="美食图片" style="width: 100%; height: 160px; object-fit: cover;">
+                    <div
+                        style="padding: 10px 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h5 style="margin: 0 0 5px 0;">街角烧烤摊</h5>
+                            <div style="margin-bottom: 5px;">⭐⭐⭐⭐☆ 4.2分 | 人均 ¥60</div>
+                            <p style="font-size: 0.9em; color: #666; margin: 0 0 8px 0; line-height: 1.4;">
+                                烟火气十足，羊肉串、烤茄子是必点，适合夜宵。</p>
+                            <div style="margin-bottom: 8px;"><span
+                                    style="background: #ffe3e3; color: #e03131; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-right: 5px;">烧烤</span><span
+                                    style="background: #fff9db; color: #e67700; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">夜宵</span><span
+                                    style="background: #d0ebff; color: #1971c2; padding: 2px 6px; border-radius: 3px; font-size: 0.8em; margin-left: 5px;">接地气</span>
+                            </div>
+                        </div>
+                        <div style="color: #888; font-size: 0.9em;">📍 望京西路 | 800m <button type="button"
+                                style="float: right; padding: 3px 8px; font-size: 0.8em; background-color: #f1f3f5; color: #495057;">收藏</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add more discover cards -->
+            </div>
+            <!-- Pagination or Load More button -->
+            <div style="text-align: center; margin-top: 30px;"><button type="button">加载更多...</button></div>
+        </section>
+    </div>
+
+    <!-- 美食社区 原型 -->
+    <h2 id="community">前端原型图 - 美食社区 (Community Page)</h2>
+    <div class="prototype">
+        <section>
+            <!-- Community Tabs -->
+            <div style="margin-bottom: 20px;">
+                <button type="button" class="tab active">推荐</button>
+                <button type="button" class="tab">关注</button>
+                <button type="button" style="float: right; background-color: #28a745;">✍️ 发布动态</button>
+            </div>
+        </section>
+
+        <section>
+            <h4>动态信息流 (Feed)</h4>
+            <!-- Post Item 1 -->
+            <div
+                style="border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 20px; padding: 15px; background-color: #fff;">
+                <!-- Post Header -->
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNhMGFkYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItY2lyY2xlIj48cGF0aCBkPSJNMTggOWE4IDggMCAwIDAtMTEuMSAwdjExYS41LjUgMCAwIDAgLjQ2LS44NGMtLjUtMS4zLTMtMy40LTUuODYtMy40cy01LjM2IDIuMS01Ljg2IDMuNGEuNS41IDAgMCAwIC40Ni44NGwxMS4xLS4wNFoiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg=="
+                        alt="User Avatar" style="width: 44px; height: 44px; border-radius: 50%; margin-right: 10px;">
+                    <div>
+                        <span style="font-weight: bold; color: #333;">吃货日记</span><br>
+                        <small style="color: #888;">2小时前 · 来自 北京</small>
+                    </div>
+                    <button type="button"
+                        style="margin-left: auto; background: #e7f5ff; color: #1c7ed6; padding: 5px 10px; font-size: 0.85em;">+
+                        关注</button>
+                </div>
+                <!-- Post Content -->
+                <div style="margin-bottom: 10px;">
+                    <p>周末探店成功！这家新开的 Brunch 太棒了，牛油果吐司和班尼迪克蛋都超好吃！环境也很适合拍照。强烈推荐！</p>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 5px; margin-top: 10px;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMzAiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2YxZjNmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                            alt="Post Image 1"
+                            style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMzAiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2YxZjNmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                            alt="Post Image 2"
+                            style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMzAgMzAiPjxyZWN0IHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgZmlsbD0iI2YxZjNmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIzIiBmaWxsPSIjY2VkNGVhIj4xNTB4MTUwPC90ZXh0Pjwvc3ZnPg=="
+                            alt="Post Image 3"
+                            style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+                    </div>
+                </div>
+                <!-- Post Location & Tags -->
+                <div style="margin-bottom: 10px;">
+                    <span style="color: #007bff; font-size: 0.9em;">📍 Cafe Brunch Delight (三里屯店)</span><br>
+                    <span
+                        style="background: #e7f5ff; color: #1c7ed6; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; margin-top: 5px; display: inline-block;">#brunch</span>
+                    <span
+                        style="background: #fff3bf; color: #f59f00; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; margin-top: 5px; display: inline-block;">#周末去哪儿</span>
+                    <span
+                        style="background: #d3f9d8; color: #2f9e44; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; margin-top: 5px; display: inline-block;">#网红探店</span>
+                </div>
+                <!-- Post Actions -->
+                <div
+                    style="display: flex; justify-content: space-around; border-top: 1px solid #f1f3f5; padding-top: 10px;">
+                    <button type="button" style="background: none; border: none; color: #6c757d; cursor: pointer;">❤️ 点赞
+                        (128)</button>
+                    <button type="button" style="background: none; border: none; color: #6c757d; cursor: pointer;">💬 评论
+                        (35)</button>
+                    <button type="button" style="background: none; border: none; color: #6c757d; cursor: pointer;">🔗
+                        分享</button>
+                </div>
+                <!-- Optional: Comment Preview -->
+                <div
+                    style="background: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 4px; font-size: 0.9em;">
+                    <p style="margin: 0 0 5px 0;"><b>美食家小李:</b> 看起来好棒！下周就去！</p>
+                    <p style="margin: 0;"><b>隔壁老王:</b> 人多吗？需要排队不？</p>
+                    <a href="#post-comments" style="color: #007bff; display: block; margin-top: 5px;">查看全部35条评论</a>
+                </div>
+            </div>
+
+            <!-- Post Item 2 (Example with no images) -->
+            <div
+                style="border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 20px; padding: 15px; background-color: #fff;">
+                <!-- Post Header -->
+                <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NCIgaGVpZ2h0PSI0NCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNhMGFkYmYiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItY2lyY2xlIj48cGF0aCBkPSJNMTggOWE4IDggMCAwIDAtMTEuMSAwdjExYS41LjUgMCAwIDAgLjQ2LS44NGMtLjUtMS4zLTMtMy40LTUuODYtMy40cy01LjM2IDIuMS01Ljg2IDMuNGEuNS41IDAgMCAwIC40Ni44NGwxMS4xLS4wNFoiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjwvc3ZnPg=="
+                        alt="User Avatar" style="width: 44px; height: 44px; border-radius: 50%; margin-right: 10px;">
+                    <div>
+                        <span style="font-weight: bold; color: #333;">面条爱好者</span><br>
+                        <small style="color: #888;">昨天 18:30</small>
+                    </div>
+                    <button type="button"
+                        style="margin-left: auto; background: #f1f3f5; color: #868e96; padding: 5px 10px; font-size: 0.85em;"
+                        disabled>已关注</button>
+                </div>
+                <!-- Post Content -->
+                <div style="margin-bottom: 10px;">
+                    <p>谁能推荐一家北京最好吃的炸酱面？求地道！</p>
+                </div>
+                <!-- Post Tags -->
+                <div style="margin-bottom: 10px;">
+                    <span
+                        style="background: #e7f5ff; color: #1c7ed6; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; margin-top: 5px; display: inline-block;">#北京美食</span>
+                    <span
+                        style="background: #fff9db; color: #e67700; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; margin-top: 5px; display: inline-block;">#面食</span>
+                    <span
+                        style="background: #f8f9fa; color: #495057; padding: 2px 6px; border-radius: 10px; font-size: 0.8em; margin-right: 5px; margin-top: 5px; display: inline-block;">#求推荐</span>
+                </div>
+                <!-- Post Actions -->
+                <div
+                    style="display: flex; justify-content: space-around; border-top: 1px solid #f1f3f5; padding-top: 10px;">
+                    <button type="button" style="background: none; border: none; color: #6c757d; cursor: pointer;">❤️ 点赞
+                        (55)</button>
+                    <button type="button" style="background: none; border: none; color: #6c757d; cursor: pointer;">💬 评论
+                        (88)</button>
+                    <button type="button" style="background: none; border: none; color: #6c757d; cursor: pointer;">🔗
+                        分享</button>
+                </div>
+            </div>
+            <!-- More posts -->
+            <!-- Pagination or Load More button -->
+            <div style="text-align: center; margin-top: 30px;"><button type="button">加载更多动态...</button></div>
+        </section>
+    </div>
+
+    <!-- 其他模块占位符 -->
+    <h2>其他模块原型图 (待补充)</h2>
+    <div class="prototype">
+        <p>以下模块的前端原型图待后续详细设计：</p>
+        <ul style="padding-left: 20px;">
+            <li>美食推荐模块 (首页推荐流、不同维度推荐页)</li>
+            <li>搜索功能模块 (搜索框、联想、历史记录、筛选条件面板、搜索结果页)</li>
+            <li>社区功能模块 (动态发布页、动态列表、动态详情、评论区)</li>
+            <li>收藏功能模块 (收藏列表页、收藏夹管理、添加收藏交互)</li>
+        </ul>
+    </div>
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+    <p style="text-align: center; color: #888;"><small>注意：以上图表和原型均为示意性设计，用于沟通和理解项目结构与功能，具体实现细节以最终开发为准。</small></p>
+
+    <script>
+        // --- 注册功能脚本 ---
+        const regMethodSelect = document.getElementById('reg-method');
+        const emailGroup = document.getElementById('reg-email-group');
+        const phoneGroup = document.getElementById('reg-phone-group');
+        const regEmailInput = document.getElementById('reg-email');
+        const regPhoneInput = document.getElementById('reg-phone');
+
+        if (regMethodSelect && emailGroup && phoneGroup && regEmailInput && regPhoneInput) {
+            regMethodSelect.addEventListener('change', (e) => {
+                const isEmail = e.target.value === 'email';
+                emailGroup.style.display = isEmail ? 'block' : 'none';
+                regEmailInput.required = isEmail;
+                phoneGroup.style.display = isEmail ? 'none' : 'block';
+                regPhoneInput.required = !isEmail;
+            });
+            // Initial state
+            const initialIsEmail = regMethodSelect.value === 'email';
+            emailGroup.style.display = initialIsEmail ? 'block' : 'none';
+            regEmailInput.required = initialIsEmail;
+            phoneGroup.style.display = initialIsEmail ? 'none' : 'block';
+            regPhoneInput.required = !initialIsEmail;
+        }
+
+        const pwdInput = document.getElementById('reg-password');
+        const confirmPwdInput = document.getElementById('reg-confirm-password');
+        const pwdStrengthSpan = document.getElementById('pwd-strength');
+        const confirmPwdMsgSpan = document.getElementById('confirm-pwd-msg');
+
+        if (pwdInput && pwdStrengthSpan) {
+            pwdInput.addEventListener('input', () => {
+                const val = pwdInput.value;
+                let strength = '';
+                let color = '#6c757d'; // Default color
+                const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{12,})");
+                const mediumRegex = new RegExp("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.{8,})");
+
+                if (strongRegex.test(val)) {
+                    strength = '强';
+                    color = 'green';
+                } else if (mediumRegex.test(val)) {
+                    strength = '中';
+                    color = 'orange';
+                } else if (val.length > 0 && val.length < 8) {
+                    strength = '太短';
+                    color = 'red';
+                } else if (val.length >= 8) {
+                    strength = '弱';
+                    color = 'red';
+                }
+
+                pwdStrengthSpan.textContent = strength;
+                pwdStrengthSpan.style.color = color;
+                validateConfirmPassword(); // Validate confirm password whenever main password changes
+            });
+        }
+        if (confirmPwdInput && confirmPwdMsgSpan) {
+            confirmPwdInput.addEventListener('input', validateConfirmPassword);
+            // Also check on password input blur
+            if (pwdInput) pwdInput.addEventListener('blur', validateConfirmPassword);
+        }
+
+        function validateConfirmPassword() {
+            if (pwdInput && confirmPwdInput && confirmPwdMsgSpan) {
+                if (confirmPwdInput.value.length > 0 && pwdInput.value !== confirmPwdInput.value) {
+                    confirmPwdMsgSpan.textContent = '两次输入的密码不一致';
+                } else {
+                    confirmPwdMsgSpan.textContent = '';
+                }
+            }
+        }
+
+
+        // --- 登录功能脚本 ---
+        const loginPasswordDiv = document.getElementById('login-method-password');
+        const loginCaptchaDiv = document.getElementById('login-method-captcha');
+        const loginAccountPwdInput = document.getElementById('login-account-pwd');
+        const loginPasswordInput = document.getElementById('login-password');
+        const loginAccountCaptchaInput = document.getElementById('login-account-captcha');
+        const loginCaptchaInput = document.getElementById('login-captcha');
+        const loginTabPassword = document.getElementById('login-tab-password');
+        const loginTabCaptcha = document.getElementById('login-tab-captcha');
+
+
+        function switchLoginMethod(method) {
+            const isPassword = method === 'password';
+            if (loginPasswordDiv && loginCaptchaDiv && loginAccountPwdInput && loginPasswordInput && loginAccountCaptchaInput && loginCaptchaInput && loginTabPassword && loginTabCaptcha) {
+                loginPasswordDiv.style.display = isPassword ? 'block' : 'none';
+                loginAccountPwdInput.required = isPassword;
+                loginPasswordInput.required = isPassword;
+
+                loginCaptchaDiv.style.display = isPassword ? 'none' : 'block';
+                loginAccountCaptchaInput.required = !isPassword;
+                loginCaptchaInput.required = !isPassword;
+
+                loginTabPassword.classList.toggle('active', isPassword);
+                loginTabCaptcha.classList.toggle('active', !isPassword);
+            }
+        }
+        // Initialize login method display
+        switchLoginMethod('password');
+
+
+        // --- 个人信息 - 头像预览 ---
+        const avatarUploadInput = document.getElementById('avatar-upload');
+        const currentAvatarImg = document.getElementById('current-avatar');
+
+        if (avatarUploadInput && currentAvatarImg) {
+            avatarUploadInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    if (file.size > 2 * 1024 * 1024) { // Check size (e.g., 2MB)
+                        alert('图片大小不能超过 2MB');
+                        avatarUploadInput.value = ''; // Clear the input
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        currentAvatarImg.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                } else if (file) {
+                    alert('请选择有效的图片文件 (JPG, PNG, GIF)');
+                    avatarUploadInput.value = ''; // Clear the input
+                }
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
