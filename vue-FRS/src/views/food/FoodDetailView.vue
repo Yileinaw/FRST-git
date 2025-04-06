@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import type { FoodInfo } from '@/types/food';
 import { useUserStore } from '@/store/modules/user';
 import { ArrowLeft, Shop, Star } from '@element-plus/icons-vue';
@@ -65,7 +65,6 @@ const props = defineProps<{
     id: string;
 }>();
 
-const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
 

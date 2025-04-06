@@ -58,7 +58,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value!.clearFiles();
     const file = files[0] as UploadRawFile;
     uploadRef.value!.handleStart(file);
-    handleFileChange(fileList.value[0]);
+    ElMessage.warning('只能上传一张图片，旧图片已被替换');
 };
 
 const handleFileChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
@@ -86,7 +86,7 @@ const handleFileChange: UploadProps['onChange'] = (uploadFile, uploadFiles) => {
     fileList.value = uploadFiles;
 };
 
-const handleFileRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+const handleFileRemove: UploadProps['onRemove'] = (_uploadFile, uploadFiles) => {
     imageUrls.value = [];
     fileList.value = uploadFiles;
     console.log('Image removed');

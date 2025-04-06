@@ -1,4 +1,4 @@
-import type { FoodInfo, FoodCategory } from '@/types/food';
+import type { FoodInfo } from '@/types/food';
 import type { PostInfo, CommentInfo, PostAuthorInfo, PaginatedList } from '@/types/api';
 
 // --- Import all TestImages --- 

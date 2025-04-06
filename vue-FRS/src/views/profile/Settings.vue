@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { useUserStore } from '@/store/modules/user';
-import { ElCard, ElForm, ElFormItem, ElInput, ElButton, ElMessage } from 'element-plus';
+import { ElCard, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 
 const userStore = useUserStore();
@@ -104,7 +104,7 @@ const passwordForm = reactive({
 });
 
 // Custom validator for confirming password
-const validatePassConfirm = (rule: any, value: any, callback: any) => {
+const validatePassConfirm = (_rule: any, value: any, callback: any) => {
     if (value === '') {
         callback(new Error('请再次输入新密码'));
     } else if (value !== passwordForm.new) {
@@ -159,10 +159,6 @@ const handleUpdatePassword = async () => {
     display: flex;
     flex-direction: column;
     gap: 20px; // Space between cards
-}
-
-.setting-card {
-    // No specific styles needed unless overriding defaults
 }
 
 .card-header {
