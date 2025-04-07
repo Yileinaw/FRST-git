@@ -11,6 +11,7 @@ export interface PostInfo {
     lastReplyAt?: Date | string | null; // 最后回复时间，可能没有回复
     replyCount: number; // 回复数
     likeCount: number; // 点赞数
+    isLiked?: boolean; // 是否点赞
     // 根据需要可以添加更多字段，例如：
     // tags?: string[];
     // status?: 'published' | 'draft' | 'deleted';

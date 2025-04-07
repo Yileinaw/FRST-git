@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql" // Ensure this matches your setup
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  email         String   @unique
+  password_hash String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  avatar        String?  @db.LongText
+  actions       UserAction[]     // Relation from UserAction model
+  posts         Post[]           // User's posts
+  comments      Comment[]        // User's comments
+  likes         Like[]           // User's likes
+  reviews       Review[]         // User's reviews
+  collections   CollectionItem[] // User's collections
+}
+
+model UserAction {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  action_type  String
+  timestamp    DateTime @default(now())
+  details      String?
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+enum CollectionType {
+  FOOD
+  RESTAURANT
+  POST
+}
+
+model Post {
+  id         Int       @id @default(autoincrement())
+  title      String
+  content    String    @db.Text
+  imageUrls  Json?     // Changed from String[] to Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  authorId   Int
+  author     User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments   Comment[]
+  likes      Like[]
+  collections CollectionItem[] @relation("CollectedPost") // Explicit relation name
+
+  @@index([authorId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  Int
+  postId    Int
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, map: "fk_comment_author")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "fk_comment_post")
+
+  @@index([authorId])
+  @@index([postId])
+}
+
+model Like {
+  createdAt DateTime @default(now())
+  userId    Int
+  postId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_like_user")
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "fk_like_post")
+
+  @@id([userId, postId])
+  @@index([postId])
+}
+
+model FoodItem {
+  id           Int      @id @default(autoincrement())
+  name         String
+  description  String?  @db.Text
+  category     String?
+  imageUrl     String?
+  averageRating Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  reviews      Review[]
+  collections  CollectionItem[] @relation("CollectedFood") // Explicit relation name
+}
+
+model Restaurant {
+  id           Int      @id @default(autoincrement())
+  name         String
+  description  String?  @db.Text
+  address      String?
+  location     String?
+  imageUrl     String?
+  averageRating Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  reviews      Review[]
+  collections  CollectionItem[] @relation("CollectedRestaurant") // Explicit relation name
+}
+
+model Review {
+  id           Int      @id @default(autoincrement())
+  rating       Int
+  comment      String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  authorId     Int
+  foodItemId   Int?
+  restaurantId Int?
+  author       User        @relation(fields: [authorId], references: [id], onDelete: Cascade, map: "fk_review_author")
+  foodItem     FoodItem?   @relation(fields: [foodItemId], references: [id], onDelete: Cascade, map: "fk_review_food")
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: Cascade, map: "fk_review_restaurant")
+
+  @@index([authorId])
+  @@index([foodItemId])
+  @@index([restaurantId])
+}
+
+model CollectionItem {
+  id            Int            @id @default(autoincrement())
+  userId        Int
+  itemType      CollectionType // Enum: FOOD, RESTAURANT, POST
+  // --- Separate nullable foreign keys ---
+  postId        Int?
+  restaurantId  Int?
+  foodItemId    Int?
+  // --- Timestamps ---
+  createdAt     DateTime       @default(now())
+
+  // --- Relations ---
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_collection_user")
+  // Use new foreign keys for relations
+  post          Post?          @relation("CollectedPost", fields: [postId], references: [id], onDelete: Cascade, map: "fk_collection_post_item")
+  restaurant    Restaurant?    @relation("CollectedRestaurant", fields: [restaurantId], references: [id], onDelete: Cascade, map: "fk_collection_restaurant_item")
+  foodItem      FoodItem?      @relation("CollectedFood", fields: [foodItemId], references: [id], onDelete: Cascade, map: "fk_collection_food_item")
+
+  // --- Constraints ---
+  // Ensure only one foreign key is set based on itemType (Enforced by application logic or DB constraints if needed)
+
+  // Define unique constraints for each type of collection per user
+  @@unique([userId, postId], name: "unique_user_post_collection")
+  @@unique([userId, restaurantId], name: "unique_user_restaurant_collection")
+  @@unique([userId, foodItemId], name: "unique_user_food_collection")
+  // Note: The combination (userId, itemType, specific_fk) implicitly becomes unique
+  // because only one specific_fk can be non-null for a given row due to how we'll create data.
+  // Depending on DB, NULLs might affect unique constraints differently.
+  // A single complex constraint might be possible but more complex to define/manage.
+
+  // --- Indexes ---
+  @@index([userId])
+  @@index([postId])
+  @@index([restaurantId])
+  @@index([foodItemId])
+}

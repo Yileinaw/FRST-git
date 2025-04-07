@@ -13,9 +13,9 @@
             <div class="post-content-card">
                 <!-- Author Info -->
                 <div class="author-info">
-                    <el-avatar :size="40" :src="post.author.avatar || defaultAvatar" class="author-avatar" />
+                    <el-avatar :size="40" :src="post.author?.avatar || defaultAvatar" class="author-avatar" />
                     <div class="author-details">
-                        <span class="author-username">{{ post.author.username }}</span>
+                        <span class="author-username">{{ post.author?.username || '未知作者' }}</span>
                         <span class="post-time">{{ formatRelativeTime(post.createdAt) }}</span>
                     </div>
                 </div>
@@ -24,20 +24,24 @@
                 <div class="post-body" v-html="formattedContent(post.content)"></div>
 
                 <!-- Post Images -->
-                <div v-if="post.images && post.images.length > 0" class="post-images">
-                    <el-image v-for="(imgUrl, index) in post.images" :key="index" :src="imgUrl"
-                        :preview-src-list="post.images" :initial-index="index" fit="cover" loading="lazy"
+                <div v-if="post.imageUrls && post.imageUrls.length > 0" class="post-images">
+                    <el-image v-for="(imgUrl, index) in post.imageUrls" :key="index" :src="imgUrl"
+                        :preview-src-list="post.imageUrls" :initial-index="index" fit="cover" loading="lazy"
                         class="post-image-item" />
                 </div>
 
                 <!-- Actions -->
                 <div class="post-actions">
-                    <el-button :type="post.isLiked ? 'primary' : ''" text @click="handleLikePost"
-                        :icon="post.isLiked ? StarFilled : Star" :loading="likeLoading">
-                        {{ post.likes }} 赞
+                    <el-button 
+                        @click="handleLikePost" 
+                        :loading="likeLoading">
+                        <el-icon :color="isLiked ? 'var(--el-color-primary)' : ''" class="like-icon">
+                            <component :is="isLiked ? StarFilled : Star" />
+                        </el-icon>
+                        <span class="like-count">{{ likeCount }} 赞</span>
                     </el-button>
                     <el-button text :icon="ChatDotRound">
-                        {{ post.commentsCount }} 评论
+                        {{ commentsCount }} 评论
                     </el-button>
                     <!-- Add Collection Button -->
                     <el-button 
@@ -56,9 +60,16 @@
 
             <!-- Comments Section -->
             <div class="comments-section-card">
-                <h3 class="comments-title">评论 ({{ post.commentsCount }})</h3>
-                <CommentList :post-id="postId" :comments="comments" :has-more="hasMoreComments"
-                    :loading="commentsLoading" @load-more="loadMoreComments" @add-comment="handleAddComment" />
+                <h3 class="comments-title">评论 ({{ commentsCount }})</h3>
+                <CommentList 
+                    ref="commentListRef"
+                    :post-id="postId" 
+                    :comments="comments" 
+                    :has-more="hasMoreComments" 
+                    :loading="commentsLoading" 
+                    @load-more="loadMoreComments" 
+                    @add-comment="handleAddComment" 
+                    @reply-clicked="handleReply" />
             </div>
 
         </div>
@@ -69,22 +80,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useUserStore } from '@/store/modules/user';
 import { ElPageHeader, ElAvatar, ElButton, ElSkeleton, ElEmpty, ElMessage, ElIcon, ElImage } from 'element-plus';
 import { Star, StarFilled, ChatDotRound, Share, CollectionTag } from '@element-plus/icons-vue';
 import CommentList from '@/components/business/CommentList.vue';
-import { findPostById, getCommentsByPostId, togglePostLike, addCommentToPost } from '@/utils/mockDataHelper';
-import { formatRelativeTime } from '@/utils/timeFormatter.ts';
-import type { PostInfo, CommentInfo, PostAuthorInfo } from '@/types/api';
+import api from '@/services/api';
+import { formatRelativeTime } from '@/utils/timeFormatter';
+import type { PostInfo as PostListInfo } from '@/types/post.d.ts';
+import type { CommentInfo, PostAuthorInfo, PaginatedList } from '@/types/api';
 import defaultAvatar from '@/assets/images/default-avatar.png';
+
+// Define a more detailed type for the post detail view
+interface PostDetailInfo {
+    id: number;
+    title: string;
+    content: string;
+    imageUrls?: string[]; // Optional array of strings
+    createdAt: string | Date;
+    updatedAt: string | Date;
+    authorId: number;
+    author: { // Nested author object
+        id: number;
+        username: string;
+        avatar?: string;
+    };
+    _count: { // Counts object
+        comments: number;
+        likes: number;
+    };
+    // Add isLiked later when backend supports it
+    // isLiked?: boolean; 
+}
 
 // --- State ---
 const route = useRoute();
 const router = useRouter();
 const userStore = useUserStore();
-const post = ref<PostInfo | null>(null);
+const post = ref<PostDetailInfo | null>(null);
 const comments = ref<CommentInfo[]>([]);
 const loading = ref(true);
 const commentsLoading = ref(false);
@@ -94,16 +128,26 @@ const commentsPage = ref(1);
 const commentsPageSize = 10;
 const addingToCollection = ref(false);
 
+// Separate refs for reactive counts and like state, initialized from post
+const likeCount = ref(0);
+const commentsCount = ref(0);
+const isLiked = ref(false); // Default to false, will be initialized
+
+const commentListRef = ref<InstanceType<typeof CommentList> | null>(null);
+const replyingTo = ref<PostAuthorInfo | null>(null);
+const commentInputContent = ref('');
+
 // --- Computed ---
 const postId = computed(() => {
     const id = route.params.id;
-    const parsedId = Number(Array.isArray(id) ? id[0] : id);
+    const idString = Array.isArray(id) ? id[0] : id;
+    const parsedId = Number(idString);
     return isNaN(parsedId) ? 0 : parsedId;
 });
 
 const isAlreadyCollected = computed(() => {
     if (!post.value || !postId.value) return false;
-    return userStore.isCollected('post', postId.value);
+    return userStore.isCollected('post', Number(postId.value));
 });
 
 // --- Methods ---
@@ -113,29 +157,33 @@ const goBack = () => {
 
 const fetchPostDetails = async () => {
     loading.value = true;
+    post.value = null;
     try {
         const id = postId.value;
         if (!id) {
-            console.error("Post ID is missing from route parameters.");
-            ElMessage.error("无法加载帖子，缺少ID");
-            post.value = null;
+            console.error("Post ID is missing or invalid.");
+            ElMessage.error("无法加载帖子，ID无效");
             return;
         }
-        const fetchedPost = await findPostById(id);
-        if (fetchedPost) {
-            post.value = fetchedPost;
-            // Reset comments when fetching a new post
-            comments.value = [];
-            commentsPage.value = 1;
-            hasMoreComments.value = true;
-            await fetchComments(); // Fetch initial comments
-        } else {
-            post.value = null;
-            ElMessage.warning("帖子未找到");
-        }
-    } catch (error) {
+        console.log(`Fetching post details for ID: ${id}`);
+        const response = await api.get<PostDetailInfo & { isLiked?: boolean }>(`/posts/${id}`);
+        console.log(`[PostDetail fetch] Received raw data: likes=${response.data?._count?.likes}, isLiked=${response.data?.isLiked}`);
+        post.value = response.data;
+        likeCount.value = post.value?._count?.likes ?? 0;
+        commentsCount.value = post.value?._count?.comments ?? 0;
+        isLiked.value = response.data.isLiked ?? false;
+        console.log(`[PostDetail fetch] State updated: likeCount=${likeCount.value}, isLiked=${isLiked.value}`);
+        comments.value = [];
+        commentsPage.value = 1;
+        hasMoreComments.value = true;
+        await fetchComments();
+    } catch (error: any) {
         console.error("Error fetching post details:", error);
-        ElMessage.error("加载帖子详情失败");
+        if (error.response?.status === 404) {
+            ElMessage.warning("帖子未找到或已被删除");
+        } else {
+            ElMessage.error("加载帖子详情失败");
+        }
         post.value = null;
     } finally {
         loading.value = false;
@@ -143,12 +191,22 @@ const fetchPostDetails = async () => {
 };
 
 const fetchComments = async () => {
-    if (!post.value || !postId.value) return;
+    if (!postId.value || commentsLoading.value) return;
     commentsLoading.value = true;
     try {
-        const response = await getCommentsByPostId(postId.value, commentsPage.value, commentsPageSize);
-        comments.value = [...comments.value, ...response.list]; // Append new comments
-        hasMoreComments.value = comments.value.length < response.total;
+        console.log(`Fetching comments for post ID: ${postId.value}, Page: ${commentsPage.value}`);
+        const response = await api.get<{ data: CommentInfo[], pagination: { totalItems: number } }>(`/posts/${postId.value}/comments`, {
+            params: {
+                page: commentsPage.value,
+                limit: commentsPageSize,
+            }
+        });
+        console.log("Comments response:", response.data);
+
+        const fetchedComments = response.data?.data || [];
+        const pagination = response.data?.pagination || { totalItems: 0 };
+        comments.value = [...comments.value, ...fetchedComments];
+        hasMoreComments.value = comments.value.length < pagination.totalItems;
         commentsPage.value += 1;
     } catch (error) {
         console.error("Error fetching comments:", error);
@@ -165,100 +223,121 @@ const loadMoreComments = () => {
 };
 
 const handleLikePost = async () => {
-    if (!post.value || likeLoading.value) return;
+    if (!post.value || likeLoading.value || !userStore.userInfo) {
+        if (!userStore.userInfo) {
+            ElMessage.warning('请先登录再点赞');
+        }
+        return;
+    }
     likeLoading.value = true;
     try {
-        const currentLikeState = post.value.isLiked;
-        const newState = await togglePostLike(post.value.id, currentLikeState);
-        // Update local state immediately for better UX
-        post.value.isLiked = newState;
-        post.value.likes += newState ? 1 : -1;
-    } catch (error) {
-        console.error("Error liking post:", error);
-        ElMessage.error("操作失败，请稍后再试");
-        // Revert optimistic update on error? Or rely on next fetch.
+        console.log(`Toggling like for post ID: ${postId.value}`);
+        const response = await api.post<{ likes: number; isLiked: boolean }>(`/posts/${postId.value}/like`);
+        console.log(`[PostDetail like] Received raw data: likes=${response.data?.likes}, isLiked=${response.data?.isLiked}`);
+        likeCount.value = response.data.likes;
+        isLiked.value = response.data.isLiked;
+        console.log(`[PostDetail like] State updated: likeCount=${likeCount.value}, isLiked=${isLiked.value}`);
+    } catch (error: any) {
+        console.error("Error toggling post like:", error);
+        const message = error.response?.data?.message || "操作失败，请稍后再试";
+        ElMessage.error(message);
     } finally {
         likeLoading.value = false;
     }
 };
 
-const handleAddComment = async (content: string, replyToUserId?: number): Promise<boolean> => {
-    if (!post.value || !postId.value) return false; // Indicate failure
-
-    // Find replyTo author info if replyToUserId is provided
-    let replyToAuthor: PostAuthorInfo | undefined = undefined;
-    if (replyToUserId) {
-        // Search existing comments for the author (this is inefficient in real app, API should handle it)
-        replyToAuthor = comments.value.find(c => c.author.id === replyToUserId)?.author;
-        // In a real app, you'd have the current user info readily available
+const handleAddComment = async (content: string): Promise<boolean> => {
+    if (!post.value || !postId.value || !userStore.userInfo) {
+        ElMessage.warning('请先登录再发表评论');
+        return false;
+    }
+    if (!content.trim()) {
+        ElMessage.warning('评论内容不能为空');
+        return false;
     }
 
-    // Simulate getting current user (replace with actual user data later)
-    const currentUser: PostAuthorInfo = { id: 999, username: '当前用户' };
+    const finalContent = replyingTo.value ? `@${replyingTo.value.username} ${content}` : content;
 
+    console.log(`Adding comment for post ID: ${postId.value}, Content: ${finalContent}`);
     try {
-        const newComment = await addCommentToPost(postId.value, {
-            author: currentUser, // Use simulated current user
-            content: content,
-            replyTo: replyToAuthor,
+        const response = await api.post<CommentInfo>(`/posts/${postId.value}/comments`, { 
+            content: finalContent
         });
+        
+        ElMessage.success('评论发表成功');
+        replyingTo.value = null;
+        comments.value = [];
+        commentsPage.value = 1;
+        hasMoreComments.value = true;
+        await fetchComments();
+        commentsCount.value = (post.value?._count?.comments ?? 0) + 1; 
+        if(post.value?._count) post.value._count.comments += 1;
 
-        if (newComment && post.value) {
-            comments.value.unshift(newComment); // Add to the top of the list
-            post.value.commentsCount += 1;
-            return true; // Indicate success
-        } else {
-            ElMessage.error("评论失败，请稍后再试");
-            return false;
-        }
-    } catch (error) {
+        return true;
+
+    } catch (error: any) {
         console.error("Error adding comment:", error);
-        ElMessage.error("评论失败，请稍后再试");
+        const message = error.response?.data?.message || "评论失败，请稍后再试";
+        ElMessage.error(message);
         return false;
     }
 };
 
-// Simple formatting for display (replace newline with <br>)
-const formattedContent = (content: string) => {
-    return content.replace(/\n/g, '<br>');
+const handleReply = (author: PostAuthorInfo) => {
+    console.log('Replying to:', author);
+    replyingTo.value = author;
 };
 
-// --- Add Share Method ---
+const formattedContent = (content?: string) => {
+    return content ? content.replace(/\n/g, '<br>') : '';
+};
+
 const handleShare = () => {
-    // Simulate copying link to clipboard
     const url = window.location.href;
-    // In a real app, use navigator.clipboard.writeText(url)
-    // For simulation, just show a message
-    ElMessage.success('链接已复制 (模拟)');
+    navigator.clipboard.writeText(url).then(() => {
+        ElMessage.success('链接已复制到剪贴板');
+    }, () => {
+        ElMessage.error('复制链接失败');
+    });
     console.log('Sharing URL:', url);
 };
 
-// Handle adding to collection
 const handleAddToCollection = async () => {
-    if (!post.value || isAlreadyCollected.value) return;
+    if (!post.value || isAlreadyCollected.value || addingToCollection.value) return;
     addingToCollection.value = true;
     try {
         const collectionData = {
             collectedId: Number(post.value.id),
             type: 'post' as const,
-            title: post.value.content.split('\n')[0]?.substring(0, 50) || '社区帖子',
-            imageUrl: post.value.images?.[0] || 'https://via.placeholder.com/150/CCCCCC/FFFFFF?text=Post',
+            title: post.value.title || '社区帖子',
+            imageUrl: post.value.imageUrls?.[0] || 'https://via.placeholder.com/150/CCCCCC/FFFFFF?text=Post',
             link: `/post/${post.value.id}`
         };
-        userStore.addCollection(collectionData);
+        console.log("Adding to collection:", collectionData);
+        await userStore.addCollection(collectionData);
+        ElMessage.success('收藏成功');
     } catch (error) {
         console.error("Error adding post to collection:", error);
+        ElMessage.error('收藏失败');
     } finally {
         addingToCollection.value = false;
     }
 };
 
-// --- Lifecycle ---
-onMounted(async () => {
-    if (!userStore.hasFetchedCollections) {
-        await userStore.fetchCollections();
+onMounted(() => {
+    if (postId.value) {
+        fetchPostDetails();
+    } else {
+        console.error("Post ID is invalid on mount.");
+        loading.value = false;
     }
-    fetchPostDetails();
+});
+
+watch(() => route.params.id, (newId, oldId) => {
+    if (newId !== oldId && postId.value) {
+        console.log(`Post ID changed from ${oldId} to ${newId}, refetching...`);
+        fetchPostDetails();
+    }
 });
 
 </script>
@@ -323,8 +402,6 @@ onMounted(async () => {
     color: var(--el-text-color-regular);
     margin-bottom: 15px;
     white-space: pre-wrap;
-    /* Ensures 
- are treated as line breaks */
     word-break: break-word;
 }
 
@@ -348,7 +425,7 @@ onMounted(async () => {
     gap: 15px;
 
     .el-button {
-        padding: 8px;
+        padding: 8px 5px;
     }
 }
 
@@ -364,5 +441,14 @@ onMounted(async () => {
 .not-found {
     padding: 40px 20px;
     text-align: center;
+}
+
+.like-icon {
+    vertical-align: middle;
+}
+
+.like-count {
+    margin-left: 4px;
+    vertical-align: middle;
 }
 </style>

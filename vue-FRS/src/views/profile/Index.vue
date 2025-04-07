@@ -14,11 +14,13 @@
               </el-upload>
             </div>
             <div class="user-info">
-              <p class="username">{{ userStore.userInfo?.username || '用户名加载中...' }}</p>
+              <p class="username">{{ userInfo?.username || '用户名加载中...' }}</p>
+              <p>邮箱: {{ userInfo?.email || '-' }}</p>
               <!-- 可以添加其他用户信息，如邮箱、简介等 -->
-              <el-button v-if="newAvatarUrl" type="primary" @click="saveAvatar" :loading="isSavingAvatar"
-                size="small">保存头像</el-button>
-              <el-button v-if="newAvatarUrl" @click="cancelAvatarChange" size="small">取消</el-button>
+              <div v-if="newAvatarUrl" class="avatar-actions">
+                <el-button type="primary" @click="saveAvatar" :loading="isSavingAvatar">保存头像</el-button>
+                <el-button @click="cancelAvatarChange">取消</el-button>
+              </div>
             </div>
           </div>
 
@@ -100,6 +102,7 @@ import type { UploadInstance, UploadProps, UploadFile, UploadRawFile } from 'ele
 import { Edit, Star, Setting, SwitchButton } from '@element-plus/icons-vue';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import CollectionList from '@/components/business/CollectionList.vue'; // Import the new component
+import apiClient from '@/services/api'; // Make sure apiClient is imported
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -107,7 +110,7 @@ const authStore = useAuthStore();
 const uploadRef = ref<UploadInstance>();
 
 const activeTab = ref('info'); // Default to info tab
-const newAvatarUrl = ref<string | null>(null); // Store temporary Data URL for new avatar
+const newAvatarUrl = ref<string | null>(null); // To store the temporary Data URL for preview
 const isSavingAvatar = ref(false);
 const isLoadingCollections = ref(false);
 
@@ -156,17 +159,30 @@ const handleAvatarChange: UploadProps['onChange'] = (uploadFile: UploadFile) => 
 // Save the new avatar
 const saveAvatar = async () => {
   if (!newAvatarUrl.value) return;
+
   isSavingAvatar.value = true;
   try {
-    // Simulate potential API call delay if needed in future
-    // await new Promise(resolve => setTimeout(resolve, 500)); 
-    userStore.updateAvatar(newAvatarUrl.value); // Update store (which saves to LS)
-    ElMessage.success('头像更新成功!');
-    newAvatarUrl.value = null; // Clear temporary URL
-    uploadRef.value?.clearFiles(); // Clear the upload component
-  } catch (error) { // Although updateAvatar doesn't throw now, keep for future
-    console.error("Error saving avatar:", error);
-    ElMessage.error('头像保存失败');
+    // Call the backend API to save the Data URL
+    const response = await apiClient.put('/users/me/avatar', { 
+      avatarDataUrl: newAvatarUrl.value 
+    });
+
+    if (response.data && response.data.avatar) {
+      // Update the store with the URL returned from backend (might still be Data URL in this simple case)
+      userStore.updateAvatar(response.data.avatar);
+      ElMessage.success('头像更新成功');
+      newAvatarUrl.value = null; // Clear preview URL
+    } else {
+      ElMessage.error('头像更新失败：服务器返回无效响应。');
+    }
+
+  } catch (error: any) {
+    console.error('Error saving avatar:', error);
+    let errMsg = '头像更新失败';
+    if (error.response && error.response.data && error.response.data.message) {
+      errMsg += `: ${error.response.data.message}`;
+    }
+    ElMessage.error(errMsg);
   } finally {
     isSavingAvatar.value = false;
   }
@@ -255,6 +271,9 @@ const goTo = (path: string) => {
     // Handle other potential menu clicks if needed
   }
 };
+
+// Get user info reactively from the store
+const userInfo = computed(() => userStore.userInfo);
 
 </script>
 
@@ -350,5 +369,11 @@ const goTo = (path: string) => {
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--el-border-color-extralight);
+}
+
+.avatar-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
 }
 </style>

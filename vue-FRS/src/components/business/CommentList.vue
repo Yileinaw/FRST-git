@@ -2,7 +2,7 @@
   <div class="comment-list">
     <!-- 发表评论输入框 -->
     <div class="add-comment">
-      <el-input v-model="newCommentContent" placeholder="留下你的精彩评论吧..." :rows="2" type="textarea" resize="none"
+      <el-input ref="commentInputRef" v-model="newCommentContent" placeholder="留下你的精彩评论吧..." :rows="2" type="textarea" resize="none"
         maxlength="200" show-word-limit />
       <el-button type="primary" @click="submitComment" :disabled="!newCommentContent"
         :loading="isSubmitting">发表评论</el-button>
@@ -22,7 +22,10 @@
             {{ comment.content }}
           </div>
           <div class="comment-actions">
-            <el-button text size="small" @click="replyToComment(comment.author)">回复</el-button>
+            <el-button text size="small" @click="replyToComment(comment.author)">
+              <el-icon style="margin-right: 4px;"><ChatLineRound /></el-icon>
+              回复
+            </el-button>
             <!-- 可以添加点赞评论等操作 -->
           </div>
         </div>
@@ -39,11 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, nextTick } from 'vue';
 import type { CommentInfo, PostAuthorInfo } from '@/types/api';
-import { ElInput, ElButton, ElAvatar, ElEmpty, ElMessage } from 'element-plus';
+import { ElInput, ElButton, ElAvatar, ElEmpty, ElMessage, ElIcon } from 'element-plus';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { formatRelativeTime } from '@/utils/timeFormatter.ts';
+import { ChatLineRound } from '@element-plus/icons-vue';
 
 const props = defineProps<{
   postId: number | string;
@@ -52,11 +56,11 @@ const props = defineProps<{
   loading: boolean;
 }>();
 
-const emit = defineEmits(['load-more', 'add-comment']);
+const emit = defineEmits(['load-more', 'add-comment', 'reply-clicked']);
 
 const newCommentContent = ref('');
 const isSubmitting = ref(false);
-const replyToUser = ref<PostAuthorInfo | null>(null); // 当前回复的目标用户
+const commentInputRef = ref<InstanceType<typeof ElInput> | null>(null);
 
 const submitComment = async () => {
   if (!newCommentContent.value.trim()) {
@@ -65,29 +69,20 @@ const submitComment = async () => {
   }
   isSubmitting.value = true;
   try {
-    // 调用父组件传递的 add-comment 事件，并传递回复用户 ID
-    const success = await emit('add-comment', newCommentContent.value, replyToUser.value?.id);
-    if (success) {
-      newCommentContent.value = ''; // 清空输入框
-      replyToUser.value = null; // 清除回复目标
-      ElMessage.success('评论发表成功!');
-    } else {
-      // ElMessage.error('评论失败，请稍后再试');
-    }
+    emit('add-comment', newCommentContent.value);
+    newCommentContent.value = '';
   } catch (error) {
-    console.error('Submit comment error:', error);
-    // ElMessage.error('评论失败，请稍后再试');
+    console.error('Error occurred during submitComment (likely in parent handler):', error);
   } finally {
     isSubmitting.value = false;
   }
 };
 
-// 设置回复目标
 const replyToComment = (author: PostAuthorInfo) => {
-  replyToUser.value = author;
-  // 可以在输入框 placeholder 中提示正在回复谁
-  // 或将光标聚焦到输入框
-  // inputRef.value?.focus();
+  emit('reply-clicked', author);
+  nextTick(() => {
+    commentInputRef.value?.focus();
+  });
 };
 
 </script>

@@ -48,19 +48,17 @@
         <template #header>
           <div class="card-header">
             <span>热门帖子</span>
-            <el-link type="primary" @click="goToCommunity">查看更多</el-link>
+            <el-link type="primary" v-if="router.hasRoute('Community')" @click="goToCommunity">查看更多</el-link>
           </div>
         </template>
         <div v-loading="communityLoading">
-          <el-empty description="社区静悄悄，快来发帖吧~" v-if="!hotPosts.length && !communityLoading"></el-empty>
+          <el-empty :description="errorMessage || '获取帖子失败'" v-if="errorMessage && !communityLoading"></el-empty>
+          <el-empty description="社区静悄悄，快来发帖吧~" v-else-if="!posts.length && !communityLoading"></el-empty>
           <ul class="post-list" v-else>
-            <li v-for="post in hotPosts" :key="post.id" class="post-item" @click="goToPostDetail(post.id)">
+            <li v-for="post in posts" :key="post.id" class="post-item" @click="goToPostDetail(post.id)">
               <span class="post-title">{{ post.title }}</span>
               <div class="post-meta">
-                <span class="author">by {{ post.authorName }}</span>
-                <span class="likes" v-if="post.likes"><el-icon>
-                    <Pointer />
-                  </el-icon> {{ post.likes }}</span>
+                <span class="author">by {{ post.author?.username || '未知' }}</span>
               </div>
             </li>
           </ul>
@@ -75,9 +73,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Search, Pointer } from '@element-plus/icons-vue';
 import type { FoodCategory } from '@/types/food';
-import type { PostInfo } from '@/types/api';
-// import type { FoodInfo } from '@/types/food'; // 移除 FoodInfo
-// import FoodCard from '@/components/business/FoodCard.vue'; // 移除 FoodCard
+import apiClient from '@/services/api';
 
 // --- 导入所有 TestImages 图片资源 --- 
 // (这里需要所有 TestImages 的导入，以便随机选取)
@@ -137,8 +133,9 @@ const router = useRouter();
 
 const currentCity = ref('beijing');
 const searchKeyword = ref('');
-const loading = ref(false); // 主加载状态 (可用于整体或特定部分)
-const communityLoading = ref(false); // 社区部分加载状态
+const loading = ref(false); // General loading, maybe rename or remove if only posts loading matters
+const communityLoading = ref(true); // Use this specifically for posts section
+const errorMessage = ref(''); // Error message for posts section
 
 // --- 轮播图数据结构 ---
 interface CarouselItem {
@@ -215,62 +212,57 @@ const foodCategories = ref<FoodCategory[]>([
   { id: 'drink', name: '饮品' },
 ]);
 
-// --- 模拟热门帖子数据 ---
-interface HotPost {
+// --- Define types for post data from API ---
+interface Author {
+  id: number;
+  username: string;
+}
+interface Post {
   id: number;
   title: string;
-  authorName: string;
-  likes?: number;
+  content: string; 
+  createdAt: string; 
+  author: Author;
+  _count?: { comments?: number; likes?: number };
 }
-const hotPosts = ref<HotPost[]>([]);
+const posts = ref<Post[]>([]); // Renamed from hotPosts to posts
 
-// --- Define LocalStorage Key ---
-const POSTS_KEY = 'frs_posts'; // Match the key from mockDataHelper
+// --- Fetch Posts from API --- 
+async function fetchPosts() {
+  communityLoading.value = true;
+  errorMessage.value = '';
+  posts.value = []; // Clear previous posts
+  try {
+    const response = await apiClient.get('/posts', {
+      params: {
+        limit: 6, // Fetch latest 6 posts for homepage
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      }
+    });
+    if (response.data && Array.isArray(response.data.data)) {
+      posts.value = response.data.data;
+      console.log('Loaded posts from API:', posts.value);
+    } else {
+      console.warn('Received unexpected data structure for posts:', response.data);
+      errorMessage.value = '无法解析帖子数据。';
+    }
+  } catch (error: any) {
+    console.error('Failed to fetch posts:', error);
+    errorMessage.value = '无法加载帖子，请稍后再试。';
+  } finally {
+    communityLoading.value = false;
+  }
+}
 
-// 模拟获取数据 (合并为一个函数)
-const fetchData = () => {
-  // --- Load Carousel (no change) ---
+// --- Fetch Initial Data --- 
+onMounted(() => {
+  // Load Carousel data (no change needed here)
   const shuffled = [...allAvailableCarouselItems].sort(() => 0.5 - Math.random());
   carouselItems.value = shuffled.slice(0, 8);
-
-  // --- Load Hot Posts from LocalStorage ---
-  communityLoading.value = true;
-  hotPosts.value = []; // Clear previous posts
-  try {
-    const storedPosts = localStorage.getItem(POSTS_KEY);
-    if (storedPosts) {
-      const parsedPosts: PostInfo[] = JSON.parse(storedPosts);
-      // Basic validation
-      if (Array.isArray(parsedPosts)) {
-        // Sort by likes (descending) or use other criteria if needed
-        // For now, just take the first few as "hot"
-        const latestPosts = parsedPosts.slice(-4).reverse(); // Get latest 4 posts
-
-        hotPosts.value = latestPosts.map(post => ({
-          // Ensure ID is a number
-          id: Number(post.id), 
-          title: post.content.substring(0, 50) + (post.content.length > 50 ? '...' : '') || '查看帖子详情',
-          authorName: post.author.username,
-          likes: post.likes
-        }));
-        console.log('Loaded hot posts from localStorage:', hotPosts.value);
-      }
-    }
-  } catch (error) {
-    console.error('Error loading posts from localStorage for homepage:', error);
-    // Handle error, maybe show a message or leave hotPosts empty
-  } finally {
-     // Simulate loading time even if loaded quickly or failed
-     setTimeout(() => {
-         communityLoading.value = false;
-     }, 300); 
-  }
-};
-// --- fetchData function end ---
-
-// 组件挂载时加载数据
-onMounted(() => {
-  fetchData();
+  
+  // Fetch posts from API instead of localStorage
+  fetchPosts();
 });
 
 const handleSearch = () => {
@@ -291,7 +283,12 @@ const goToCommunity = () => {
 };
 
 const goToPostDetail = (postId: number) => {
-  router.push(`/post/${postId}`);
+  if (router.hasRoute('PostDetail')) { 
+    router.push({ name: 'PostDetail', params: { id: postId } });
+  } else {
+    console.warn('Route PostDetail not found');
+    router.push(`/post/${postId}`); // Fallback or handle differently
+  }
 };
 
 const goToFoodDetail = (foodId: number) => {

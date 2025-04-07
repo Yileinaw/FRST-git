@@ -2,145 +2,192 @@
   <div class="community-view">
     <div class="header-section">
       <h2>交流分享</h2>
-      <el-button type="primary" :icon="EditPen">发布新帖</el-button>
+      <el-button type="primary" :icon="EditPen" @click="openCreatePostDialog">发布新帖</el-button>
     </div>
 
     <el-tabs v-model="activeSortTab" @tab-change="handleSortChange">
-      <el-tab-pane label="最新回复" name="lastReply"></el-tab-pane>
       <el-tab-pane label="最新发布" name="createdAt"></el-tab-pane>
       <el-tab-pane label="热门帖子" name="hot"></el-tab-pane>
     </el-tabs>
 
-    <div class="post-list-container" v-loading="loading">
-      <el-empty description="还没有人发帖，快来抢沙发吧！" v-if="!paginatedPosts.length && !loading"></el-empty>
-      <ul class="post-list" v-else>
-        <li v-for="post in paginatedPosts" :key="post.id" class="post-item" @click="goToPostDetail(post.id)">
-          <div class="post-avatar">
-            <!-- 暂时使用默认头像或首字母 -->
-            <el-avatar :size="40"> {{ post.authorName.charAt(0) }} </el-avatar>
-          </div>
-          <div class="post-content">
-            <h3 class="post-title">{{ post.title }}</h3>
-            <div class="post-meta">
-              <span class="author">{{ post.authorName }}</span>
-              <span class="time">{{ formatRelativeTime(post.lastReplyAt || post.createdAt) }}</span>
-            </div>
-          </div>
-          <div class="post-stats">
-            <span class="replies">
-              <el-icon>
-                <ChatDotRound />
-              </el-icon>
-              {{ post.replyCount }}
-            </span>
-            <span class="likes">
-              <el-icon>
-                <Pointer />
-              </el-icon>
-              {{ post.likeCount }}
-            </span>
-          </div>
-        </li>
-      </ul>
-
-      <el-pagination v-if="filteredAndSortedPosts.length > pageSize" :current-page="currentPage" :page-size="pageSize"
-        :total="filteredAndSortedPosts.length" @current-change="handlePageChange" layout="prev, pager, next" background
-        class="community-pagination" />
+    <div class="post-list-wrapper" data-cy="post-list-wrapper">
+      <el-skeleton :rows="5" animated v-if="loading" data-cy="skeleton-loading" />
+      <PostList
+        v-else-if="posts.length > 0"
+        :posts="posts"
+        @post-clicked="goToPostDetail"
+        @like-toggled="handlePostLikeToggled"
+        data-cy="post-list"
+      />
+      <el-empty description="还没有帖子呢，快来发布第一条吧！" v-else data-cy="empty-posts" />
     </div>
+
+    <el-pagination
+      v-if="!loading && totalPosts > pageSize"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      :total="totalPosts"
+      @current-change="handlePageChange"
+      layout="prev, pager, next"
+      background
+      class="community-pagination"
+    />
+
+    <CreatePostDialog v-model="createPostDialogVisible" @post-success="handlePostSuccess" />
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { EditPen, ChatDotRound, Pointer } from '@element-plus/icons-vue';
-import type { PostInfo } from '@/types/post'; // 引入帖子类型
-import { formatRelativeTime } from '@/utils/timeFormatter.ts'; // 假设的时间格式化工具
+import { EditPen } from '@element-plus/icons-vue';
+import type { PostInfo } from '@/types/post.d.ts';
+import api from '@/services/api';
+import PostList from './components/PostList.vue';
+import { useUserStore } from '@/store/modules/user';
+import { ElMessage } from 'element-plus';
+import CreatePostDialog from '@/components/business/CreatePostDialog.vue';
+
+// Log the imported api instance to check its structure
+console.log('[CommunityView] Imported API service:', api);
 
 const router = useRouter();
-
 const loading = ref(false);
-const allPosts = ref<PostInfo[]>([]); // 所有帖子
-const activeSortTab = ref('lastReply'); // 当前排序方式
-
-// Pagination state
+const posts = ref<PostInfo[]>([]);
+const activeSortTab = ref('createdAt');
 const currentPage = ref(1);
-const pageSize = ref(15); // 每页显示帖子数量
+const pageSize = ref(15);
+const totalPosts = ref(0);
+const totalPages = ref(1);
+const userStore = useUserStore();
+const createPostDialogVisible = ref(false);
 
-// 模拟获取帖子数据
+const sortMapping: { [key: string]: { sortBy: string, sortOrder: 'asc' | 'desc' } } = {
+  createdAt: { sortBy: 'createdAt', sortOrder: 'desc' },
+  hot: { sortBy: 'hot', sortOrder: 'desc' },
+};
+
 const fetchPosts = async () => {
+  console.log('[CommunityView] fetchPosts called.'); // Log start of fetchPosts
   loading.value = true;
-  allPosts.value = [];
-  // 模拟 API 请求延迟
-  await new Promise(resolve => setTimeout(resolve, 800));
-  // 创建模拟数据
-  const mockPosts: PostInfo[] = [];
-  const authors = ['美食家小李', '爱探索的张三', '厨房新手王五', '甜品控赵六', '深夜食堂常客'];
-  for (let i = 1; i <= 50; i++) {
-    const createdAt = new Date(Date.now() - Math.random() * 1000 * 3600 * 24 * 7); // 7天内随机创建时间
-    const lastReplyAt = Math.random() > 0.3 ? new Date(createdAt.getTime() + Math.random() * 1000 * 3600 * 24) : createdAt; // 随机回复时间
-    mockPosts.push({
-      id: 200 + i, // 避免与美食 ID 冲突
-      title: `关于 ${['家常菜', '餐厅推荐', '烘焙心得', '饮品测评', '厨房技巧'][i % 5]} 的讨论帖 ${i}`,
-      authorId: i % 5 + 1,
-      authorName: authors[i % 5],
-      createdAt: createdAt,
-      lastReplyAt: lastReplyAt,
-      replyCount: Math.floor(Math.random() * 100),
-      likeCount: Math.floor(Math.random() * 200),
+  posts.value = [];
+  try {
+    const sortParams = sortMapping[activeSortTab.value] || sortMapping.createdAt;
+    console.log(`[CommunityView] Preparing to fetch posts. Page: ${currentPage.value}, Limit: ${pageSize.value}, Sort:`, sortParams); // Log before API call
+
+    // --- API Call (Corrected Path) --- 
+    // Assuming baseURL in api.ts already includes /api
+    const response = await api.get('/posts', {
+      params: {
+        page: currentPage.value,
+        limit: pageSize.value,
+        sortBy: sortParams.sortBy,
+        sortOrder: sortParams.sortOrder,
+      }
     });
+    // --- End API Call ---
+
+    console.log('[CommunityView] API response received:', response.data); // Log successful response data
+
+    const fetchedPosts = response.data.posts.map((post: any) => {
+      console.log(`[CommunityView fetch] Mapping post ID ${post.id}: likes=${post._count?.likes}, isLiked=${post.isLiked}`);
+      return {
+        id: post.id,
+        title: post.title,
+        authorId: post.author.id,
+        authorName: post.author.username,
+        createdAt: post.createdAt,
+        replyCount: post._count.comments,
+        likeCount: post._count.likes,
+        isLiked: post.isLiked ?? false,
+      };
+    });
+
+    posts.value = fetchedPosts;
+    totalPosts.value = response.data.totalPosts;
+    totalPages.value = response.data.totalPages;
+    currentPage.value = response.data.currentPage;
+
+  } catch (error: any) { // Catch specific error type if known, or use any
+    console.error("[CommunityView] Error fetching posts:", error);
+    // Log more details from the error object if available
+    if (error.response) {
+      console.error("[CommunityView] Error response data:", error.response.data);
+      console.error("[CommunityView] Error response status:", error.response.status);
+      console.error("[CommunityView] Error response headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("[CommunityView] Error request:", error.request);
+    } else {
+      console.error("[CommunityView] Error message:", error.message);
+    }
+    // Optionally show user message here
+  } finally {
+    loading.value = false;
+    console.log('[CommunityView] fetchPosts finished.'); // Log end of fetchPosts
   }
-  allPosts.value = mockPosts;
-  loading.value = false;
 };
 
-// 计算属性：根据当前排序方式对帖子进行排序
-const filteredAndSortedPosts = computed(() => {
-  const postsToSort = [...allPosts.value];
-  switch (activeSortTab.value) {
-    case 'createdAt':
-      postsToSort.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      break;
-    case 'hot':
-      // 简单热门排序：点赞 + 回复 * 2
-      postsToSort.sort((a, b) => (b.likeCount + b.replyCount * 2) - (a.likeCount + a.replyCount * 2));
-      break;
-    case 'lastReply':
-    default:
-      postsToSort.sort((a, b) => new Date(b.lastReplyAt || b.createdAt).getTime() - new Date(a.lastReplyAt || a.createdAt).getTime());
-      break;
-  }
-  return postsToSort;
-});
-
-// 计算属性：获取当前页需要显示的帖子
-const paginatedPosts = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredAndSortedPosts.value.slice(start, end);
-});
-
-// 处理排序标签切换
 const handleSortChange = (tabName: string | number) => {
-  activeSortTab.value = tabName as string;
-  currentPage.value = 1; // 切换排序时回到第一页
+  console.log(`[CommunityView] Sort changed to: ${tabName}`);
+  if (typeof tabName === 'string') {
+    activeSortTab.value = tabName;
+    currentPage.value = 1;
+    fetchPosts();
+  }
 };
 
-// 处理分页改变
 const handlePageChange = (page: number) => {
+  console.log(`[CommunityView] Page changed to: ${page}`);
   currentPage.value = page;
-  // 可以添加滚动到顶部的逻辑
-  document.querySelector('.post-list-container')?.scrollIntoView({ behavior: 'smooth' });
+  fetchPosts();
 };
 
-// 跳转到帖子详情
 const goToPostDetail = (postId: number) => {
   router.push(`/post/${postId}`);
 };
 
-// 组件挂载时加载数据
+const openCreatePostDialog = () => {
+  if (!userStore.userInfo) {
+    ElMessage.warning('请先登录再发帖');
+    return;
+  }
+  createPostDialogVisible.value = true;
+};
+
+const handlePostSuccess = () => {
+  createPostDialogVisible.value = false;
+  fetchPosts();
+};
+
+const handlePostLikeToggled = async ({ postId, currentState }: { postId: number, currentState: boolean }) => {
+    if (!userStore.userInfo) {
+        ElMessage.warning('请先登录再点赞');
+        return;
+    }
+    
+    console.log(`[CommunityView] Like toggled for post ${postId}, current state: ${currentState}`);
+    
+    const postIndex = posts.value.findIndex(p => p.id === postId);
+    if (postIndex === -1) return;
+
+    try {
+        const response = await api.post<{ likes: number; isLiked: boolean }>(`/posts/${postId}/like`);
+        console.log(`[CommunityView like] Received raw data for post ${postId}: likes=${response.data?.likes}, isLiked=${response.data?.isLiked}`);
+        if (postIndex !== -1) {
+            posts.value[postIndex].likeCount = response.data.likes;
+            posts.value[postIndex].isLiked = response.data.isLiked;
+            console.log(`[CommunityView like] Post ${postId} state updated: likeCount=${posts.value[postIndex].likeCount}, isLiked=${posts.value[postIndex].isLiked}`);
+        }
+
+    } catch (error: any) {
+        console.error(`[CommunityView] Error toggling like for post ${postId}:`, error);
+        ElMessage.error(error.response?.data?.message || "操作失败，请稍后再试");
+    }
+};
+
 onMounted(() => {
+  console.log('[CommunityView] Component mounted, calling fetchPosts...'); // Log onMounted start
   fetchPosts();
 });
 
@@ -166,91 +213,9 @@ onMounted(() => {
   }
 }
 
-.el-tabs {
+.post-list-wrapper {
+  min-height: 300px;
   margin-bottom: 20px;
-
-  :deep(.el-tabs__header) {
-    margin-bottom: 10px;
-  }
-}
-
-.post-list-container {
-  min-height: 400px; // 避免加载时塌陷
-}
-
-.post-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.post-item {
-  display: flex;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: var(--el-fill-color-light);
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  .post-avatar {
-    margin-right: 15px;
-    flex-shrink: 0; // 防止头像被压缩
-  }
-
-  .post-content {
-    flex-grow: 1;
-    overflow: hidden; // 防止标题过长溢出
-  }
-
-  .post-title {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--el-text-color-primary);
-    margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    &:hover {
-      color: var(--el-color-primary);
-    }
-  }
-
-  .post-meta {
-    font-size: 13px;
-    color: var(--el-text-color-secondary);
-
-    .author {
-      margin-right: 10px;
-    }
-  }
-
-  .post-stats {
-    display: flex;
-    align-items: center;
-    font-size: 13px;
-    color: var(--el-text-color-secondary);
-    margin-left: 20px;
-    flex-shrink: 0; // 防止统计数据被压缩
-
-    span {
-      display: inline-flex;
-      align-items: center;
-      margin-left: 15px;
-
-      .el-icon {
-        margin-right: 4px;
-      }
-    }
-  }
 }
 
 .community-pagination {

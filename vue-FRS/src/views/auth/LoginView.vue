@@ -14,6 +14,7 @@
           placeholder="用户名/手机号/邮箱"
           size="large"
           prefix-icon="User"
+          data-cy="login-username"
         />
       </el-form-item>
 
@@ -25,6 +26,7 @@
           size="large"
           prefix-icon="Lock"
           show-password
+          data-cy="login-password"
         />
       </el-form-item>
 
@@ -38,6 +40,7 @@
           native-type="submit"
           size="large"
           style="width: 100%;"
+          data-cy="login-submit"
         >
           登录
         </el-button>
@@ -46,6 +49,11 @@
       <div class="form-links">
         <el-link type="primary" @click="goToRegister">立即注册</el-link>
         <el-link type="info">忘记密码?</el-link>
+      </div>
+
+      <!-- Add a place to display error messages -->
+      <div v-if="errorMessage" class="error-message" style="color: red; margin-bottom: 1rem;">
+        {{ errorMessage }}
       </div>
     </el-form>
   </div>
@@ -59,7 +67,7 @@ import { ElMessage } from 'element-plus';
 import { User, Lock } from '@element-plus/icons-vue'; // 引入图标
 import { useAuthStore } from '@/store/modules/auth';
 import { useUserStore } from '@/store/modules/user';
-import { loginByPassword } from '@/api/auth'; // 引入登录 API
+import apiClient from '@/services/api'; // Import the configured Axios instance
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -67,6 +75,7 @@ const userStore = useUserStore();
 
 const loginFormRef = ref<FormInstance>();
 const loading = ref(false);
+const errorMessage = ref(''); // To display API errors
 
 const loginForm = reactive({
   username: '',
@@ -80,62 +89,50 @@ const loginRules = reactive<FormRules>({
   // captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 });
 
-const handleLogin = async () => {
-  if (!loginFormRef.value) return;
-  await loginFormRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true;
-      try {
-        // -------- START: 模拟登录修改 --------
-        console.log('模拟登录: 跳过 API 调用');
+async function handleLogin() {
+  loading.value = true;
+  errorMessage.value = ''; // Clear previous errors
 
-        // 1. 设置假的 Token
-        const fakeToken = 'fake-local-dev-token-' + Date.now();
-        authStore.setToken(fakeToken);
-        console.log('模拟登录: 设置 Token ->', fakeToken);
+  try {
+    // Prepare payload with the correct field name expected by the backend
+    const payload = {
+        emailOrUsername: loginForm.username, // Assuming loginForm.username holds the input
+        password: loginForm.password
+    };
+    
+    // Use the payload in the API call
+    const response = await apiClient.post('/auth/login', payload);
 
-        // 2. 设置假的用户信息 (可以根据需要自定义)
-        const fakeUserInfo = {
-          id: 999,
-          username: loginForm.username || 'local-test-user',
-          nickname: '本地测试用户',
-          avatar: '', // 可以放一个默认头像 URL
-          roles: ['user'], // 模拟用户角色
-        };
-        userStore.setUser(fakeUserInfo as any); // 使用 as any 绕过严格类型检查
-        console.log('模拟登录: 设置用户信息 ->', fakeUserInfo);
+    if (response.data && response.data.token) {
+      const { token, user } = response.data;
 
-        ElMessage.success('模拟登录成功!');
-        router.push('/'); // 跳转到首页
+      // 1. Store the token
+      localStorage.setItem('authToken', token);
 
-        // -------- END: 模拟登录修改 --------
+      // 2. Store user info (e.g., in Pinia store)
+      authStore.setToken(token);
+      userStore.setUser(user);
+      console.log('Login successful, user:', user); // Placeholder
 
-        /* -------- START: 原始 API 调用代码 (已注释) --------
-        const res = await loginByPassword(loginForm); // 调用密码登录 API
-        if (res.code === 0 && res.data) { // 登录成功
-          authStore.setToken(res.data.token);
-          userStore.setUser(res.data.userInfo);
-          ElMessage.success('登录成功!');
-          router.push('/'); // 跳转到首页
-        } else {
-          // API 报错已在 request.ts 中处理，这里可以不处理或根据需要细化
-          // ElMessage.error(res.message || '登录失败');
-        }
-        -------- END: 原始 API 调用代码 -------- */
+      // 3. Redirect to home or dashboard
+      router.push({ name: 'Home' }); // Assuming you have a route named 'Home'
 
-      } catch (error) {
-        // 在模拟登录模式下，通常不会执行到这里，除非上面的代码出错
-        console.error('模拟登录过程中发生错误:', error);
-        ElMessage.error('模拟登录失败，请查看控制台');
-      } finally {
-        loading.value = false;
-      }
     } else {
-      console.log('表单校验失败!');
-      return false;
+      // Should not happen if backend sends correct response
+      errorMessage.value = 'Login failed: Invalid response from server.';
     }
-  });
-};
+
+  } catch (error: any) {
+    console.error('Login error:', error);
+    if (error.response && error.response.data && error.response.data.message) {
+      errorMessage.value = error.response.data.message; // Show backend error
+    } else {
+      errorMessage.value = 'An unexpected error occurred during login.';
+    }
+  } finally {
+    loading.value = false;
+  }
+}
 
 const goToRegister = () => {
   router.push('/auth/register');

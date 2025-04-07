@@ -5,7 +5,7 @@ import AuthLayout from '@/layouts/AuthLayout.vue';
 import HomeView from '@/views/home/HomeView.vue';
 import LoginView from '@/views/auth/LoginView.vue';
 import RegisterView from '@/views/auth/RegisterView.vue';
-import CommunityView from '@/views/CommunityView.vue';
+import CommunityView from '@/views/community/CommunityView.vue';
 import DiscoveryView from '@/views/discover/DiscoverView.vue';
 import ProfileView from '@/views/profile/Index.vue';
 import RestaurantDetail from '@/views/restaurant/DetailView.vue';
